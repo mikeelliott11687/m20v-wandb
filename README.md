@@ -1,6 +1,6 @@
 # Mooney M20 W&B & Performance (web)
 
-Offline single-page calculator for Mooney **M20V Acclaim Ultra**, **M20TN**, **M20U Ovation Ultra**, **M20R Ovation**, and **M20J 201** (2740 lb early / 2900 lb late).
+Offline single-page calculator for Mooney **M20V Acclaim Ultra**, **M20TN**, **M20U Ovation Ultra**, **M20R Ovation**, **M20J 201** (2740 lb early / 2900 lb late), **M20K 231**, **M20K Encore**, and **M20M Bravo**.
 Model toggle via `<select id="modelSelect">` — BEW / empty arm are never overwritten when switching.
 Companion / fallback to the Open as App workbook.
 
@@ -129,3 +129,11 @@ Each `MODEL_PROFILES` entry carries `ac: { available, weightLb: 66.1, armIn: 59.
 - **M20J_2900:** Manual 3203 Rev B — cruise/TO digitized; NORMAL paved landing **5-34** digitized (anchor 20°C/2000/2600/6HW → 975/2005); grass 5-35 anchors only.
 - **Est. LOP HP = 13.9 × GPH** (training rule-of-thumb; not POH % power).
 - BEW/empty arm never overwritten on model switch.
+
+
+## M20K / M20M notes
+
+- **M20K_231:** Manual **1228** ISSUED 9-4-81 / REV D 3-7-84 · S/N 25-0613–0780 · TSIO-360-GB · **2900 lb** TOW/LW · usable **75.6** / unusable 3 · CG 40.6@2360 / 43.5@2900 / 49.3@2900. Sec V cruise/TO/LDG **PENDING** digitization (scanned OCR).
+- **M20K_Encore:** **POH-3303** OI 7-97 / Rev A 08-03-2010 · TSIO-360-SB · **3130 lb** · usable **75.6** / unusable 3 · CG includes **41.0@2430**. Sec V **PENDING** grids (figs 5-15 / 5-20 / 5-25).
+- **M20M Bravo:** **POH/AFM 3501** OI 3-90 / Rev A 1-96 · TIO-540-AF1A/B · TOW **3368** / LW **3200** · usable **89** / unusable 6 · CG 41.0@2430 / 44@3300 / 46@3368 / 51@3368. Sec V **PENDING** grids (5-14 / 5-20 / 5-25).
+- A/C and TKS unavailable by default for these three (not confirmed in extracts). LOP HP remains **13.9 × GPH**. BEW/empty arm never overwritten.
