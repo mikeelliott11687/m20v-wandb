@@ -1,7 +1,7 @@
 {
-  "name": "M20V W&B / Performance Calculator",
-  "short_name": "M20V W&B",
-  "description": "M20V Acclaim Ultra Weight & Balance and Performance calculators — training/planning aid",
+  "name": "Mooney Weight Balance and Performance",
+  "short_name": "Mooney W&B",
+  "description": "Mooney weight balance and performance — training/planning aid",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

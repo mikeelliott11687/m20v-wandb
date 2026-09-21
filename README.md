@@ -32,7 +32,7 @@ iOS uses “Add to Home Screen” (not Chrome’s install prompt):
 1. Open the app URL in **Safari** (not Chrome/Firefox on iOS).
 2. Tap the **Share** button (square with ↑).
 3. Scroll and tap **Add to Home Screen**.
-4. Confirm the name (**M20V W&B**) and tap **Add**.
+4. Confirm the name (**Mooney W&B**) and tap **Add**.
 5. Launch from the home-screen icon — it opens full-screen (standalone) thanks to `apple-mobile-web-app-capable`.
 
 Notes: Use a real https host (e.g. GitHub Pages). After updates, reopen once online so the service worker can refresh the cache. `viewport-fit=cover` supports notched devices.
