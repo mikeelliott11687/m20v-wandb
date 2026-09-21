@@ -137,3 +137,10 @@ Each `MODEL_PROFILES` entry carries `ac: { available, weightLb: 66.1, armIn: 59.
 - **M20K_Encore:** **POH-3303** OI 7-97 / Rev A 08-03-2010 · TSIO-360-SB · **3130 lb** · usable **75.6** / unusable 3 · CG includes **41.0@2430**. Sec V **PENDING** grids (figs 5-15 / 5-20 / 5-25).
 - **M20M Bravo:** **POH/AFM 3501** OI 3-90 / Rev A 1-96 · TIO-540-AF1A/B · TOW **3368** / LW **3200** · usable **89** / unusable 6 · CG 41.0@2430 / 44@3300 / 46@3368 / 51@3368. Sec V **PENDING** grids (5-14 / 5-20 / 5-25).
 - A/C and TKS unavailable by default for these three (not confirmed in extracts). LOP HP remains **13.9 × GPH**. BEW/empty arm never overwritten.
+
+## Sec V status (2026-09-21)
+| Model | Cruise | Paved TO | Paved LDG | Grass |
+|-------|--------|----------|-----------|-------|
+| M20K 231 | 5-19 done | 5-15 done | 5-48 done | 5-16/5-49 PENDING |
+| M20K Encore | 5-20 done | 5-15 done | 5-25 done | % notes only PENDING |
+| M20M Bravo | 5-20 done | 5-14 done | 5-25 done | 5-15/5-26 PENDING |
