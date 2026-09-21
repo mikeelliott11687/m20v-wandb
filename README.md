@@ -1,6 +1,7 @@
-# M20V Acclaim Ultra — W&B & Performance (web)
+# Mooney M20 W&B & Performance (web)
 
-Offline single-page calculator for the Mooney **M20V Acclaim Ultra** and **M20TN**, with a model selector that swaps digitized cruise/TO/LDG packs and front-seat arms (BEW/empty arm inputs are never overwritten).
+Offline single-page calculator for Mooney **M20V Acclaim Ultra**, **M20TN**, **M20U Ovation Ultra**, and **M20R Ovation**.
+Model toggle via `<select id="modelSelect">` — BEW / empty arm are never overwritten when switching.
 Companion / fallback to the Open as App workbook.
 
 **Core:** `index.html` (self-contained HTML + CSS + JS — no build step), plus PWA assets (`manifest.webmanifest`, `sw.js`, `icons/`).
@@ -54,6 +55,17 @@ The web app manifest (`manifest.webmanifest`) and service worker support offline
 | `icons/apple-touch-icon.png` | 180×180 iOS home-screen icon |
 
 Paths are relative (`./`) so GitHub Pages works at repo root or a subpath like `/m20v-wandb/`.
+
+## Models
+
+| Model | Engine | Cruise | Front arms (in) | Notes |
+|-------|--------|--------|-----------------|-------|
+| **M20V** (default) | TSIO-550-G (5) turbo | FF tables ±0.5 gph/10°C | 37 / 40.25 / 43.5 | POH-003920 |
+| **M20TN** | TSIO-550-G turbo | FF tables ±0.6 gph/10°C | 36 / 37 / 39 | Grass PENDING |
+| **M20U** | IO-550-G (10) NA | MAP/% power ±0.4″/10°C | 36 / 37 / 43.5 | No grass charts |
+| **M20R** | IO-550-G (6) NA | MAP/% power ±0.4″/10°C | 36 / 37 / 39 | No grass charts |
+
+Extract packs: `/workspace/m20u/poh_extract/`, `/workspace/m20r/poh_extract/` (and prior m20v/m20tn packs).
 
 ## Features
 
