@@ -70,7 +70,7 @@ Extract packs: `/workspace/m20u/poh_extract/`, `/workspace/m20r/poh_extract/` (a
 ## Features
 
 ### Weight & Balance (unchanged core)
-- Inputs: BEW + empty arm; pilot/copilot + FWD/MID/AFT; rear L/R; fuel + density; **TKS fluid (CAV)** + density; baggage; hat rack; **Air conditioning** toggle (Sec VI 26J/30J MINUS WTS. → 66.1 lb @ 59.7 in; M20R unavailable)
+- Inputs: BEW + empty arm; pilot/copilot + FWD/MID/AFT; rear L/R; fuel + density; **TKS fluid (CAV)** + density; baggage; hat rack; **Air conditioning** toggle (Sec VI AIR CONDITIONER MINUS WTS. → **66.1 lb @ 59.7 in**; all models incl. M20R)
 - Arms: front 37 / 40.25 / 43.5; rear 73; fuel 49.23; TKS 70.7; baggage 101.5; hat rack 126
 - TKS (optional, equip list 21J): 0–6.0 gal @ 9.2 lb/gal default → full 55.2 lb @ arm 70.7 in
 - Outputs: station table, total weight, CG, useful load, CG envelope plot
@@ -115,6 +115,8 @@ Sites editor → select the embed → set the aspect ratio to a tall/portrait si
 (or the tallest custom ratio), then republish.
 
 ## Optional equipment — Air conditioning
-POH Sec VI **AIR CONDITIONER (MINUS WTS.)** (26J on M20V/U; 30J on M20TN): **(30.0) kg / (151.5) cm → 66.1 lb @ 59.7 in**.
-Toggle *Air conditioning installed* adds that station when ON. Add only if A/C is not already in BEW. Preference persists in `localStorage` across model switches.
+POH Sec VI **AIR CONDITIONER (MINUS WTS.)** (listed as 30.0 kg / 151.5 cm → **66.1 lb @ 59.7 in**): same figures in M20V / M20TN / M20U equipment lists.
+Toggle **Air conditioning installed** (near the model selector) adds a W&B station when ON; unchecked excludes it (weight 0). Helper: *Add only if A/C weight is not already included in Basic Empty Weight.* Preference key `m20-wandb-ac` persists across model switches.
+M20R POH Sec VI has no A/C line — toggle still offered with the same kit figures and a confirm-against-equipment-list note.
+Each `MODEL_PROFILES` entry carries `ac: { available, weightLb: 66.1, armIn: 59.7, note }`.
 **M20R:** no matching Sec VI equipment-list entry → toggle disabled.
