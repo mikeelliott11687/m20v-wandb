@@ -1,6 +1,6 @@
 # Mooney M20 W&B & Performance (web)
 
-Offline single-page calculator for Mooney **M20V Acclaim Ultra**, **M20TN**, **M20U Ovation Ultra**, and **M20R Ovation**.
+Offline single-page calculator for Mooney **M20V Acclaim Ultra**, **M20TN**, **M20U Ovation Ultra**, **M20R Ovation**, and **M20J 201** (2740 lb early / 2900 lb late).
 Model toggle via `<select id="modelSelect">` — BEW / empty arm are never overwritten when switching.
 Companion / fallback to the Open as App workbook.
 
@@ -120,3 +120,11 @@ Toggle **Air conditioning installed** (near the model selector) adds a W&B stati
 M20R POH Sec VI has no A/C line — toggle still offered with the same kit figures and a confirm-against-equipment-list note.
 Each `MODEL_PROFILES` entry carries `ac: { available, weightLb: 66.1, armIn: 59.7, note }`.
 **M20R:** no matching Sec VI equipment-list entry → toggle disabled.
+
+
+## M20J notes
+
+- Two GW toggles: **M20J_2740** and **M20J_2900**.
+- Cruise / W&B from Manual 3203 Rev B (late); early takeoff from Manual 1221 NTSB excerpts.
+- **Est. LOP HP = 13.9 × GPH** (training rule-of-thumb; not POH % power).
+- Landing distances PENDING for both variants. BEW/empty arm never overwritten on switch.
