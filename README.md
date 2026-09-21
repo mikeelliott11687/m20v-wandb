@@ -1,6 +1,6 @@
 # M20V Acclaim Ultra — W&B & Performance (web)
 
-Offline single-page calculator for the Mooney M20V Acclaim Ultra.
+Offline single-page calculator for the Mooney **M20V Acclaim Ultra** and **M20TN**, with a model selector that swaps digitized cruise/TO/LDG packs and front-seat arms (BEW/empty arm inputs are never overwritten).
 Companion / fallback to the Open as App workbook.
 
 **Core:** `index.html` (self-contained HTML + CSS + JS — no build step), plus PWA assets (`manifest.webmanifest`, `sw.js`, `icons/`).

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#1a3a2a" />
-  <meta name="description" content="M20V Acclaim Ultra Weight & Balance and Performance calculators — training/planning aid" />
+  <meta name="description" content="Mooney M20V Acclaim Ultra / M20TN Weight & Balance and Performance calculators — training/planning aid" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="M20V W&amp;B" />
@@ -13,7 +13,7 @@
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
   <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png" />
-  <title>M20V W&amp;B / Performance Calculator</title>
+  <title>Mooney W&amp;B / Performance Calculator</title>
   <style>
     :root {
       --bg: #f4f6f4;
@@ -473,21 +473,71 @@
       .panel { display: block !important; }
       .panel[data-print-hide] { display: none !important; }
     }
+
+    .model-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: .6rem 1rem;
+      margin: 0 0 .85rem;
+      padding: .65rem .85rem;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+    .model-bar label {
+      font-size: .8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      color: var(--muted);
+      margin: 0;
+    }
+    .model-bar select {
+      font: inherit;
+      font-weight: 600;
+      padding: .45rem .7rem;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fff;
+      min-width: 12rem;
+    }
+    .model-bar .model-meta {
+      font-size: .82rem;
+      color: var(--muted);
+      flex: 1;
+      min-width: 12rem;
+    }
+    .banner.model-note {
+      display: none;
+      margin-top: .5rem;
+    }
+    .banner.model-note.show { display: block; }
   </style>
 </head>
 <body>
-  <header class="app-header">
+    <header class="app-header">
     <h1>W&amp;B / Performance Calculator</h1>
-    <p class="sub">M20V Acclaim Ultra · Continental TSIO-550-G · Max TOW 3368 lb · MLW 3200 lb · Training aid</p>
+    <p class="sub" id="appSubtitle">M20V Acclaim Ultra · Continental TSIO-550-G (5) · Max TOW 3368 lb · MLW 3200 lb · Training aid</p>
   </header>
 
   <div class="wrap">
-    <div class="banner danger" role="note">
+    
+    <div class="model-bar" role="group" aria-label="Aircraft model">
+      <label for="modelSelect">Model</label>
+      <select id="modelSelect" aria-label="Aircraft model">
+        <option value="M20V">M20V Acclaim Ultra</option>
+        <option value="M20TN">M20TN</option>
+      </select>
+      <span class="model-meta" id="modelMeta">Continental TSIO-550-G (5) · Turbo-Normalized · POH-003920</span>
+    </div>
+    <div class="banner danger" role="note" id="pohBanner">
       <strong>AFM/POH governs.</strong>
       This is a training / flight-planning aid only — not a substitute for the official AFM/POH.
-      Cruise fuel-flow uses POH Sec V tables; takeoff/landing <em>distances</em> are not digitized yet (speeds are live).
-      Verify all figures against the M20V Acclaim Ultra AFM/POH before flight.
+      Cruise fuel-flow uses POH Sec V tables; takeoff/landing distances are digitized approximations.
+      Verify all figures against the <span id="pohBannerModel">M20V Acclaim Ultra</span> AFM/POH before flight.
     </div>
+    <div class="banner warn model-note" id="grassPendingNote" role="note"></div>
 
     <div class="main-tabs" role="tablist" aria-label="Main sections">
       <button type="button" class="active" data-main="wb" role="tab" aria-selected="true">Weight &amp; Balance</button>
@@ -812,7 +862,7 @@
               <div class="metric">
                 <div class="lbl">Rotate / liftoff</div>
                 <div class="val" id="toSpeedTo">—</div>
-                <div class="sub">KIAS (Fig 5-17/5-18 schedule)</div>
+                <div class="sub" id="toSpeedFigLabel">KIAS (Fig 5-17/5-18 schedule)</div>
               </div>
               <div class="metric">
                 <div class="lbl">50′ speed</div>
@@ -822,12 +872,12 @@
               <div class="metric" id="mToGR">
                 <div class="lbl">Ground roll</div>
                 <div class="val" id="toDistGR">—</div>
-                <div class="sub">ft · Fig 5-17 digitized</div>
+                <div class="sub" id="toGrFigLabel">ft · Fig 5-17 digitized</div>
               </div>
               <div class="metric" id="mTo50">
                 <div class="lbl">Distance over 50′</div>
                 <div class="val" id="toDist50">—</div>
-                <div class="sub">ft · Fig 5-18 digitized</div>
+                <div class="sub" id="to50FigLabel">ft · Fig 5-18 digitized</div>
               </div>
             </div>
             <div id="toDistWarn" class="banner warn" style="display:none;margin-top:.75rem"></div>
@@ -916,17 +966,17 @@
               <div class="metric">
                 <div class="lbl">Chart approach / brake</div>
                 <div class="val" id="ldgSpdChart">—</div>
-                <div class="sub">KIAS (Fig 5-71/5-72 table)</div>
+                <div class="sub" id="ldgSpeedFigLabel">KIAS (Fig 5-71/5-72 table)</div>
               </div>
               <div class="metric" id="mLdgGR">
                 <div class="lbl">Ground roll</div>
                 <div class="val" id="ldgDistGR">—</div>
-                <div class="sub">ft · Fig 5-71 digitized</div>
+                <div class="sub" id="ldgGrFigLabel">ft · Fig 5-71 digitized</div>
               </div>
               <div class="metric" id="mLdg50">
                 <div class="lbl">Distance over 50′</div>
                 <div class="val" id="ldgDist50">—</div>
-                <div class="sub">ft · Fig 5-72 digitized</div>
+                <div class="sub" id="ldg50FigLabel">ft · Fig 5-72 digitized</div>
               </div>
             </div>
             <div id="ldgDistWarn" class="banner warn" style="display:none;margin-top:.75rem"></div>
@@ -1040,7 +1090,7 @@
             <ul class="note-list">
               <li><strong>Note 1:</strong> Above 22,000 ft, power settings &gt;2300 RPM → operate at 1675°F TIT or richer.</li>
               <li><strong>Note 2:</strong> Above 30.5 inHg MP → FULL RICH mixture only.</li>
-              <li><strong>Note 3–4:</strong> Decrease FF 0.5 gph per 10°C above std; increase 0.5 gph per 10°C below std.</li>
+              <li id="cruiseOatNote"><strong>Note 3–4:</strong> Decrease FF <span id="cruiseOatCorrVal">0.5</span> gph per 10°C above std; increase <span id="cruiseOatCorrVal2">0.5</span> gph per 10°C below std.</li>
               <li>Some low power settings may not be attainable (low CHT/oil temp).</li>
               <li>TAS / range / endurance charts are <strong>not</strong> included — still graphic in Sec V.</li>
             </ul>
@@ -1053,17 +1103,21 @@
       </div>
     </div>
 
-    <footer class="disclaimer">
+        <footer class="disclaimer">
       <p><strong>Disclaimer:</strong> Training and flight-planning aid only.
       Not a substitute for the official AFM/POH or your aircraft-specific empty weight and arm.
-      <strong>Performance distances</strong> are digitized approximations of POH nomograms (Figs 5-17/5-18, 5-71/5-72) with typical ±50–100 ft uncertainty — AFM/POH chart governs; not for dispatch without verifying the paper chart.
-      Cruise fuel-flow values come from POH Sec V Best Power / Best Economy tables; TIT leaning and engine limits still apply.
-      Front-seat arms (FWD 37 / MID 40.25 / AFT 43.5 in) are approximate from Sec VI sample/graph.</p>
+      <strong>Performance distances</strong> are digitized approximations of POH nomograms
+      (<span id="footerDistFigs">Figs 5-17/5-18, 5-71/5-72</span>) with typical ±50–100 ft uncertainty — AFM/POH chart governs; not for dispatch without verifying the paper chart.
+      Cruise fuel-flow values come from POH Sec V Best Power / Best Economy tables
+      (<span id="footerCruisePages">5-23 / 5-24</span>); TIT leaning and engine limits still apply.
+      Front-seat arms (<span id="footerFrontArms">FWD 37 / MID 40.25 / AFT 43.5 in</span>) are approximate from Sec VI sample/graph.</p>
       <p style="margin-bottom:0"><strong>Limits (POH Sec II):</strong>
         Max takeoff 3368 lb · Max landing 3200 lb ·
         Baggage 120 lb @ 101.5 · Hat rack 10 lb @ 126 ·
         TKS fluid (opt.) 6.0 gal / 55.2 lb @ 70.7 ·
-        Engine TSIO-550-G 280 BHP @ 2500 RPM · Rec. cruise 262 BHP.</p>
+        Engine <span id="footerEngine">TSIO-550-G (5)</span> 280 BHP @ 2500 RPM · Rec. cruise 262 BHP ·
+        Prop <span id="footerProp">Hartzell PHC-J3YF-1RF/F7498</span>.
+        Active model: <span id="footerModel">M20V Acclaim Ultra</span> (<span id="footerPoh">POH-003920</span>).</p>
     </footer>
   </div>
 
@@ -1071,46 +1125,34 @@
 (function () {
   'use strict';
 
-  const MAX_TOW = 3368;
-  const MAX_LW = 3200;
-  const BAG_MAX = 120;
-  const HAT_MAX = 10;
-  const FUEL_ARM = 49.23;
-  const REAR_ARM = 73;
-  const BAG_ARM = 101.5;
-  const HAT_ARM = 126;
-  const TKS_ARM = 70.7;
-  const TKS_MAX_GAL = 6.0;
-  const FRONT_ARMS = { FWD: 37.0, MID: 40.25, AFT: 43.5 };
-  const ENVELOPE = [
-    { cg: 41.0, w: 2430 },
-    { cg: 44.0, w: 3300 },
-    { cg: 46.0, w: 3368 },
-    { cg: 51.0, w: 3368 },
-    { cg: 51.0, w: 2430 },
-    { cg: 41.0, w: 2430 }
-  ];
+  // ---- Model profiles (M20V / M20TN) — packed digitized data ----
+  const MODEL_PROFILES = {"M20V":{"maxTOW":3368,"maxLW":3200,"bagMax":120,"hatMax":10,"fuelArm":49.23,"rearArm":73,"bagArm":101.5,"hatArm":126,"tksArm":70.7,"tksMaxGal":6.0,"envelope":[{"cg":41.0,"w":2430},{"cg":44.0,"w":3300},{"cg":46.0,"w":3368},{"cg":51.0,"w":3368},{"cg":51.0,"w":2430},{"cg":41.0,"w":2430}],"id":"M20V","label":"M20V Acclaim Ultra","engine":"Continental TSIO-550-G (5)","engineShort":"TSIO-550-G (5)","prop":"Hartzell PHC-J3YF-1RF/F7498","poh":"POH-003920 \u00b7 OI 03-16-2017 / Rev A 08-18-2017","engineNote":"Turbo-Normalized TSIO-550-G (5)","frontArms":{"FWD":37.0,"MID":40.25,"AFT":43.5},"frontArmsNote":"FWD 37 / MID 40.25 / AFT 43.5 in (Sec VI sample/graph)","cruiseOatCorrPer10C":0.5,"cruisePohPages":"5-23 / 5-24","toFigLabel":"5-17 / 5-18","ldgFigLabel":"5-71 / 5-72","cruise":{"cols":[[2500,30.5],[2500,29.0],[2500,26.0],[2500,22.0],[2400,30.5],[2400,27.0],[2400,24.0],[2400,21.0],[2300,28.0],[2300,25.0],[2300,22.0],[2300,19.0],[2200,21.0]],"bestPower":[{"alt":0,"stdC":15,"ff":[21.4,20.6,18.7,16.1,20.4,18.0,15.8,13.4,17.8,15.5,13.1,10.5,11.0]},{"alt":2000,"stdC":11,"ff":[21.4,20.5,18.7,16.0,20.4,18.1,16.0,13.7,17.9,15.9,13.9,11.7,12.5]},{"alt":4000,"stdC":7,"ff":[21.3,20.4,18.6,15.9,20.3,18.1,16.1,14.0,17.9,16.0,14.0,11.9,12.5]},{"alt":6000,"stdC":3,"ff":[21.3,20.4,18.5,15.8,20.3,18.2,16.2,14.2,17.8,16.0,14.0,12.0,12.5]},{"alt":8000,"stdC":-1,"ff":[21.2,20.3,18.4,15.8,20.2,18.2,16.3,14.4,17.8,16.0,14.1,12.1,12.5]},{"alt":10000,"stdC":-5,"ff":[21.1,20.2,18.3,15.7,20.2,18.2,16.4,14.5,17.8,16.0,14.1,12.1,12.4]},{"alt":12000,"stdC":-9,"ff":[21.1,20.1,18.2,15.7,20.2,18.2,16.4,14.5,17.8,16.0,14.1,12.2,12.4]},{"alt":14000,"stdC":-13,"ff":[21.0,20.1,18.2,15.6,20.2,18.1,16.3,14.5,17.8,15.9,14.1,12.2,12.4]},{"alt":16000,"stdC":-17,"ff":[21.0,20.0,18.1,15.6,20.2,18.1,16.3,14.5,17.8,15.9,14.1,12.2,12.4]},{"alt":18000,"stdC":-21,"ff":[21.0,20.0,18.1,15.6,20.2,18.0,16.2,14.5,17.8,15.9,14.1,12.3,12.5]},{"alt":20000,"stdC":-25,"ff":[20.9,19.9,18.0,15.6,20.2,18.0,16.2,14.4,17.7,15.9,14.1,12.3,12.6]},{"alt":22000,"stdC":-29,"ff":[20.9,19.9,18.0,15.6,20.2,17.9,16.2,14.5,17.7,15.9,14.1,12.4,12.7]},{"alt":24000,"stdC":-33,"ff":[20.9,19.9,18.0,15.7,20.1,17.9,16.2,14.5,17.7,15.9,14.2,12.6,12.8]},{"alt":25000,"stdC":-35,"ff":[20.9,19.9,18.0,15.7,20.1,17.9,16.2,14.6,17.6,15.9,14.2,12.7,12.8]}],"bestEconomy":[{"alt":0,"stdC":15,"ff":[18.5,17.8,16.2,13.8,17.7,15.6,13.7,11.5,15.5,13.5,11.3,9.7,10.8]},{"alt":2000,"stdC":11,"ff":[18.4,17.7,16.1,13.8,17.6,15.7,13.8,11.8,15.6,13.9,12.0,10.0,10.9]},{"alt":4000,"stdC":7,"ff":[18.4,17.6,16.1,13.7,17.6,15.7,14.0,12.1,15.5,13.9,12.1,10.2,10.9]},{"alt":6000,"stdC":3,"ff":[18.3,17.5,16.0,13.6,17.5,15.7,14.1,12.3,15.5,13.9,12.2,10.3,10.9]},{"alt":8000,"stdC":-1,"ff":[18.2,17.5,15.9,13.6,17.5,15.7,14.1,12.4,15.5,13.9,12.2,10.4,10.8]},{"alt":10000,"stdC":-5,"ff":[18.1,17.4,15.8,13.5,17.4,15.7,14.2,12.5,15.5,13.9,12.2,10.4,10.8]},{"alt":12000,"stdC":-9,"ff":[18.1,17.3,15.7,13.5,17.4,15.7,14.2,12.5,15.5,13.9,12.2,10.5,10.8]},{"alt":14000,"stdC":-13,"ff":[18.1,17.3,15.7,13.5,17.4,15.7,14.1,12.5,15.5,13.9,12.2,10.5,10.8]},{"alt":16000,"stdC":-17,"ff":[18.1,17.3,15.6,13.5,17.4,15.6,14.1,12.5,15.5,13.9,12.2,10.5,10.8]},{"alt":18000,"stdC":-21,"ff":[18.0,17.2,15.6,13.5,17.4,15.6,14.1,12.5,15.5,13.9,12.2,10.6,10.9]},{"alt":20000,"stdC":-25,"ff":[18.1,17.2,15.6,13.5,17.5,15.6,14.0,12.5,15.5,13.8,12.3,10.6,11.0]},{"alt":22000,"stdC":-29,"ff":[18.1,17.2,15.6,13.5,17.5,15.6,14.0,12.5,15.4,13.8,12.3,10.7,11.1]},{"alt":24000,"stdC":-33,"ff":[18.1,17.2,15.6,13.5,17.5,15.6,14.0,12.6,15.4,13.8,12.3,10.9,11.1]},{"alt":25000,"stdC":-35,"ff":[18.1,17.2,15.6,13.5,17.5,15.6,14.1,12.7,15.4,13.8,12.4,11.0,11.2]}]},"dist":{"aircraft":"Mooney M20V Acclaim Ultra","source":"AFM/POH Section V Original Issue 03-16-2017","disclaimer":"Digitized approximations of POH nomograms for planning/training only. AFM/POH chart governs. Typical visual-read uncertainty \u00b150\u2013100 ft; verify critical ops on the paper chart.","notes":["to-117.png is Stall Speed vs Angle of Bank \u2014 not used for distances.","Takeoff: Fig 5-17 ground roll (to-118.png); Fig 5-18 over 50' (to-119.png).","Landing: Fig 5-71 ground roll (ldg-172.png); Fig 5-72 over 50' (ldg-173.png).","Landing charts note '(1) M20TN, flap seals installed'.","Hard anchors: manufacturer SL ISA over-50 TO 2100 ft @3368, LDG 2650 ft @3200.","Hard anchors: chart examples TO 24C/1000/3100/10HW/2%up \u2192 GR 1300 / over50 2300; LDG 24C/1000/2800/10HW/2%up \u2192 GR 1430; LDG over50 24C/1000/2800/10HW/2%down \u2192 2650.","Base grids are 0 wind / 0% gradient at each weight\u00d7alt\u00d7OAT; wind and gradient applied as multiplicative corrections from chart fans.","Webapp assumes 0% runway gradient unless a gradient control is added; surface factor is optional non-POH multiplier.","Humidity >80% RH: POH allows up to +10% on takeoff \u2014 not auto-applied.","Landing: +100 ft per knot over chart approach speed \u2014 advisory only, not auto-applied."],"takeoff":{"figure_ground_roll":"5-17","figure_over_50":"5-18","conditions":{"runway":"Paved, dry surface","power":"Full prior to brake release","gear":"Down","flaps":"10\u00b0","relative_humidity":"80%","humidity_note":"Humidity in excess of 80% R.H. can add up to 10% to the takeoff distance","speeds_kias":{"3368":{"to":77,"s50":84},"3100":{"to":72,"s50":80},"2900":{"to":69,"s50":78},"2700":{"to":65,"s50":75}}},"ground_roll":{"weights":[2700,2900,3100,3368],"alts":[0,2000,4000,6000,8000,10000],"oats":[-20,0,15,30,40],"distance_ft":[[[550,650,725,850,950],[625,750,850,1000,1100],[750,875,1000,1200,1300],[875,1025,1175,1400,1550],[1025,1200,1375,1650,1825],[1200,1425,1625,1950,2150]],[[625,750,825,1000,1075],[725,850,975,1150,1275],[850,1000,1150,1375,1500],[1000,1175,1350,1625,1775],[1175,1375,1600,1900,2100],[1375,1625,1875,2250,2500]],[[700,850,950,1125,1225],[825,975,1100,1300,1450],[975,1150,1300,1550,1700],[1150,1325,1525,1825,2025],[1325,1575,1800,2150,2375],[1575,1850,2125,2525,2825]],[[825,975,1100,1300,1425],[950,1125,1275,1525,1675],[1125,1325,1500,1800,1975],[1325,1550,1775,2125,2350],[1550,1825,2100,2500,2775],[1825,2150,2475,2950,3275]]],"wind":{"hw_kts":[0,5,10,15,20],"hw_mult":[1.0,0.92,0.85,0.78,0.72],"tw_kts":[0,2,5,10],"tw_mult":[1.0,1.12,1.3,1.6]},"gradient":{"up_pct":[0,1,2,3,4],"up_mult":[1.0,1.15,1.3,1.45,1.6],"dn_pct":[0,1,2],"dn_mult":[1.0,0.9,0.8]},"units":"ft"},"over_50":{"weights":[2700,2900,3100,3368],"alts":[0,2000,4000,6000,8000,10000],"oats":[-20,0,15,30,40],"distance_ft":[[[1125,1300,1475,1725,1900],[1250,1475,1675,1975,2200],[1475,1725,1950,2300,2550],[1725,2000,2275,2700,2975],[2000,2350,2650,3150,3500],[2350,2725,3125,3700,4100]],[[1275,1450,1650,1925,2125],[1425,1650,1900,2225,2475],[1650,1925,2200,2600,2875],[1925,2250,2575,3050,3350],[2250,2650,3000,3550,3950],[2650,3075,3525,4175,4625]],[[1400,1625,1850,2150,2375],[1575,1850,2100,2475,2750],[1850,2150,2475,2900,3200],[2150,2500,2850,3400,3750],[2500,2950,3350,3950,4400],[2950,3425,3925,4675,5150]],[[1600,1850,2100,2450,2700],[1800,2100,2400,2825,3125],[2100,2450,2800,3300,3650],[2450,2850,3250,3850,4250],[2850,3350,3800,4500,5000],[3350,3900,4450,5300,5850]]],"wind":{"hw_kts":[0,5,10,15,20],"hw_mult":[1.0,0.93,0.87,0.81,0.76],"tw_kts":[0,2,5],"tw_mult":[1.0,1.1,1.24]},"gradient":{"up_pct":[0,1,2,3,4],"up_mult":[1.0,1.1,1.2,1.32,1.44],"dn_pct":[0,1,2],"dn_mult":[1.0,0.92,0.85]},"units":"ft"},"example_chart":{"oat_c":24,"pa_ft":1000,"weight_lb":3100,"hw_kt":10,"grad_up_pct":2,"ground_roll_ft":1300,"over_50_ft":2300}},"landing":{"figure_ground_roll":"5-71","figure_over_50":"5-72","conditions":{"runway":"Paved, dry surface","power":"Idle","gear":"Down","flaps":"Full down 33\u00b0","braking":"Maximum","max_demonstrated_xwind_kt":18,"note":"M20TN, flap seals installed","speeds_kias":{"3200":{"apr":77,"brk":61},"3000":{"apr":74,"brk":59},"2800":{"apr":72,"brk":57},"2600":{"apr":69,"brk":55}},"approach_speed_note":"For every knot over the listed approach speed add 100 ft to the landing distance"},"ground_roll":{"weights":[2600,2800,3000,3200],"alts":[0,2000,4000,6000,8000,10000],"oats":[-20,0,15,30,40],"distance_ft":[[[1250,1375,1500,1675,1800],[1375,1500,1650,1850,2000],[1500,1650,1825,2050,2225],[1650,1825,2025,2300,2475],[1800,2025,2225,2550,2750],[2000,2225,2450,2825,3050]],[[1350,1475,1625,1800,1925],[1450,1625,1775,1975,2150],[1600,1775,1950,2200,2375],[1750,1950,2150,2450,2650],[1925,2150,2375,2725,2950],[2150,2375,2625,3025,3250]],[[1425,1575,1700,1900,2050],[1550,1700,1875,2100,2250],[1675,1875,2075,2325,2525],[1850,2075,2275,2600,2800],[2050,2275,2525,2875,3100],[2250,2525,2775,3175,3450]],[[1500,1650,1800,2000,2150],[1625,1800,1975,2200,2375],[1775,1975,2175,2450,2650],[1950,2175,2400,2725,2950],[2150,2400,2650,3025,3275],[2375,2650,2925,3350,3625]]],"wind":{"hw_kts":[0,5,10,15,20],"hw_mult":[1.0,0.94,0.88,0.83,0.78],"tw_kts":[0,2,5,10],"tw_mult":[1.0,1.08,1.2,1.42]},"gradient":{"up_pct":[0,1,2,3,4],"up_mult":[1.0,0.95,0.9,0.85,0.8],"dn_pct":[0,1,2],"dn_mult":[1.0,1.1,1.22]},"units":"ft"},"over_50":{"weights":[2600,2800,3000,3200],"alts":[0,2000,4000,6000,8000,10000],"oats":[-20,0,15,30,40],"distance_ft":[[[1925,2150,2325,2600,2775],[2075,2300,2500,2825,3025],[2250,2500,2750,3100,3350],[2475,2775,3025,3425,3725],[2725,3075,3400,3850,4175],[3025,3425,3775,4300,4700]],[[2025,2250,2450,2725,2900],[2150,2425,2625,2950,3175],[2350,2625,2875,3250,3500],[2575,2900,3175,3600,3875],[2850,3225,3550,4025,4375],[3175,3600,3950,4500,4925]],[[2100,2350,2550,2825,3025],[2250,2525,2725,3075,3300],[2450,2725,3000,3375,3650],[2700,3025,3300,3750,4050],[2975,3350,3700,4200,4550],[3300,3750,4125,4700,5125]],[[2200,2450,2650,2950,3150],[2350,2625,2850,3200,3450],[2550,2850,3125,3525,3800],[2800,3150,3450,3900,4225],[3100,3500,3850,4375,4750],[3450,3900,4300,4900,5350]]],"wind":{"hw_kts":[0,5,10,15,20],"hw_mult":[1.0,0.96,0.92,0.88,0.85],"tw_kts":[0,2,5],"tw_mult":[1.0,1.07,1.16]},"gradient":{"up_pct":[0,1,2,3,4],"up_mult":[1.0,0.97,0.94,0.91,0.88],"dn_pct":[0,1,2],"dn_mult":[1.0,1.04,1.06]},"units":"ft"},"example_chart":{"oat_c":24,"pa_ft":1000,"weight_lb":2800,"hw_kt":10,"grad_up_pct_gr":2,"grad_dn_pct_over50":2,"ground_roll_ft":1430,"over_50_ft":2650}}},"toSpeeds":[{"w":2700,"to":65,"s50":75},{"w":2900,"to":69,"s50":78},{"w":3100,"to":72,"s50":80},{"w":3368,"to":77,"s50":84}],"ldgChart":[{"w":2600,"apr":69,"brk":55},{"w":2800,"apr":72,"brk":57},{"w":3000,"apr":74,"brk":59},{"w":3200,"apr":77,"brk":61}],"grassPending":false,"grassPendingNote":""},"M20TN":{"maxTOW":3368,"maxLW":3200,"bagMax":120,"hatMax":10,"fuelArm":49.23,"rearArm":73,"bagArm":101.5,"hatArm":126,"tksArm":70.7,"tksMaxGal":6.0,"envelope":[{"cg":41.0,"w":2430},{"cg":44.0,"w":3300},{"cg":46.0,"w":3368},{"cg":51.0,"w":3368},{"cg":51.0,"w":2430},{"cg":41.0,"w":2430}],"id":"M20TN","label":"M20TN","engine":"TCM TSIO-550-G (1) / G (1B)","engineShort":"TSIO-550-G (1/1B)","prop":"Hartzell PHC-J3YF-1RF/F7693DF-2","poh":"POH003900 \u00b7 OI 12-22-2006 / Rev A 12-11-07","engineNote":"Turbocharged TSIO-550-G (1)/(1B)","frontArms":{"FWD":36.0,"MID":37.0,"AFT":39.0},"frontArmsNote":"FWD 36 / MID 37 / AFT 39 in (Sec VI graph/sample \u2014 not M20V arms)","cruiseOatCorrPer10C":0.6,"cruisePohPages":"5-24 / 5-25","toFigLabel":"5-16 / 5-17","ldgFigLabel":"5-70 / 5-71","cruise":{"cols":[[2500,30.5],[2500,29.0],[2500,26.0],[2500,22.0],[2400,30.5],[2400,27.0],[2400,24.0],[2400,21.0],[2300,28.0],[2300,25.0],[2300,22.0],[2300,19.0],[2200,21.0]],"bestPower":[{"alt":0,"stdC":15,"ff":[20.3,19.4,17.4,14.7,19.5,16.9,14.7,12.4,16.3,13.7,11.1,null,null]},{"alt":2000,"stdC":11,"ff":[20.7,19.7,17.8,15.1,19.8,17.3,15.1,12.9,16.7,14.3,11.8,null,null]},{"alt":4000,"stdC":7,"ff":[20.9,19.9,18.0,15.4,20.0,17.5,15.4,13.3,17.0,14.7,12.4,10.1,null]},{"alt":6000,"stdC":3,"ff":[21.1,20.1,18.2,15.5,20.1,17.7,15.7,13.6,17.3,15.1,12.9,10.7,10.5]},{"alt":8000,"stdC":-1,"ff":[21.2,20.2,18.2,15.6,20.2,17.9,15.8,13.8,17.4,15.3,13.2,11.1,11.1]},{"alt":10000,"stdC":-5,"ff":[21.2,20.2,18.3,15.7,20.3,17.9,15.9,13.9,17.6,15.5,13.4,11.3,11.5]},{"alt":12000,"stdC":-9,"ff":[21.2,20.2,18.3,15.7,20.3,18.0,16.0,14.0,17.7,15.6,13.5,11.5,11.7]},{"alt":14000,"stdC":-13,"ff":[21.1,20.2,18.2,15.7,20.3,18.0,16.0,14.0,17.7,15.6,13.6,11.6,11.7]},{"alt":16000,"stdC":-17,"ff":[21.0,20.1,18.2,15.7,20.2,17.9,16.0,14.0,17.7,15.6,13.6,11.6,11.7]},{"alt":18000,"stdC":-21,"ff":[20.9,20.0,18.1,15.7,20.1,17.9,16.0,14.0,17.6,15.6,13.6,11.6,11.6]},{"alt":20000,"stdC":-25,"ff":[20.7,19.8,18.0,15.7,19.9,17.8,15.9,14.0,17.5,15.5,13.5,11.5,11.5]},{"alt":22000,"stdC":-29,"ff":[20.5,19.6,17.9,15.6,19.7,17.6,15.8,13.9,17.3,15.4,13.4,11.5,11.5]},{"alt":24000,"stdC":-33,"ff":[20.2,19.4,17.6,15.4,19.4,17.4,15.6,13.8,17.1,15.2,13.4,11.5,11.6]},{"alt":25000,"stdC":-35,"ff":[20.1,19.2,17.5,15.2,19.3,17.2,15.5,13.7,17.0,15.2,13.4,11.6,11.8]}],"bestEconomy":[{"alt":0,"stdC":15,"ff":[18.2,17.3,15.4,12.9,17.5,15.0,12.9,10.8,14.5,12.1,9.7,null,null]},{"alt":2000,"stdC":11,"ff":[18.5,17.6,15.8,13.3,17.7,15.4,13.3,11.3,14.9,12.6,10.3,null,null]},{"alt":4000,"stdC":7,"ff":[18.7,17.8,16.0,13.5,17.9,15.6,13.6,11.7,15.2,13.0,10.9,null,null]},{"alt":6000,"stdC":3,"ff":[18.9,18.0,16.1,13.7,18.1,15.8,13.9,11.9,15.4,13.4,11.3,null,null]},{"alt":8000,"stdC":-1,"ff":[19.0,18.0,16.2,13.8,18.1,15.9,14.0,12.1,15.6,13.6,11.6,9.6,null]},{"alt":10000,"stdC":-5,"ff":[19.0,18.1,16.2,13.8,18.2,16.0,14.1,12.2,15.7,13.8,11.8,9.9,10.0]},{"alt":12000,"stdC":-9,"ff":[19.0,18.1,16.2,13.8,18.2,16.0,14.1,12.3,15.8,13.9,11.9,10.0,10.2]},{"alt":14000,"stdC":-13,"ff":[18.9,18.0,16.2,13.8,18.2,16.0,14.2,12.3,15.8,13.9,12.0,10.1,10.3]},{"alt":16000,"stdC":-17,"ff":[18.8,17.9,16.2,13.8,18.1,16.0,14.2,12.3,15.8,13.9,12.0,10.1,10.2]},{"alt":18000,"stdC":-21,"ff":[18.7,17.8,16.1,13.8,18.0,15.9,14.1,12.3,15.7,13.8,12.0,10.1,10.2]},{"alt":20000,"stdC":-25,"ff":[18.5,17.7,16.0,13.8,17.9,15.8,14.1,12.3,15.6,13.8,11.9,10.0,10.1]},{"alt":22000,"stdC":-29,"ff":[18.3,17.5,15.9,13.7,17.7,15.7,14.0,12.2,15.5,13.6,11.8,10.0,10.0]},{"alt":24000,"stdC":-33,"ff":[18.1,17.3,15.7,13.5,17.4,15.5,13.8,12.1,15.3,13.5,11.8,10.1,10.2]},{"alt":25000,"stdC":-35,"ff":[17.9,17.1,15.5,13.4,17.2,15.3,13.7,12.1,15.2,13.5,11.8,10.1,10.3]}]},"dist":{"aircraft":"Mooney M20TN","source":"AFM/POH POH003900 Original Issue 12-22-2006 / Rev A 12-11-07 Section V","disclaimer":"Digitized approximations of POH nomograms for planning/training only. AFM/POH chart governs. Typical visual-read / scale-transfer uncertainty \u00b150\u2013100 ft; verify critical ops on the paper chart.","notes":["Takeoff: Fig 5-16 ground roll (to-107.png); Fig 5-17 over 50\u2032 (to-108.png).","Landing: Fig 5-70 ground roll (ldg-161.png); Fig 5-71 over 50\u2032 (ldg-162.png).","Grass takeoff 5-18/5-19 and grass landing 5-72/5-73 are PENDING DATA in POH TOC \u2014 not digitized.","Takeoff charts are visually near-identical to M20V 5-17/5-18 (same worked example 1300/2300 and same speed schedule); TN TO grids reused from that matched digitization.","Landing charts differ from M20V (different speed table and example distances). Grids scaled from M20V landing family to match TN hard anchors: GR example 1330 ft; over-50 example 2550 ft.","Hard anchors (chart examples): TO 24\u00b0C/1000 ft/3100 lb/10 kt HW/2% up \u2192 GR 1300 / over50 2300; LDG GR 24\u00b0C/1000/2800/10 HW/2% up \u2192 1330; LDG over50 24\u00b0C/1000/2800/10 HW/2% down \u2192 2550.","Base grids are 0 wind / 0% gradient at each weight\u00d7alt\u00d7OAT; wind and gradient applied as multiplicative corrections from chart fans.","Humidity >80% RH: POH allows up to +10% on takeoff \u2014 not auto-applied.","Landing: +100 ft per knot over chart approach speed \u2014 advisory only, not auto-applied."],"takeoff":{"figure_ground_roll":"5-16","figure_over_50":"5-17","conditions":{"runway":"Paved, dry surface","power":"Full prior to brake release","gear":"Down","flaps":"10\u00b0","relative_humidity":"80%","humidity_note":"Humidity in excess of 80% R.H. can add up to 10% to the takeoff distance","speeds_kias":{"3368":{"to":77,"s50":84},"3100":{"to":72,"s50":80},"2900":{"to":69,"s50":78},"2700":{"to":65,"s50":75}}},"ground_roll":{"weights":[2700,2900,3100,3368],"alts":[0,2000,4000,6000,8000,10000],"oats":[-20,0,15,30,40],"distance_ft":[[[550,650,725,850,950],[625,750,850,1000,1100],[750,875,1000,1200,1300],[875,1025,1175,1400,1550],[1025,1200,1375,1650,1825],[1200,1425,1625,1950,2150]],[[625,750,825,1000,1075],[725,850,975,1150,1275],[850,1000,1150,1375,1500],[1000,1175,1350,1625,1775],[1175,1375,1600,1900,2100],[1375,1625,1875,2250,2500]],[[700,850,950,1125,1225],[825,975,1100,1300,1450],[975,1150,1300,1550,1700],[1150,1325,1525,1825,2025],[1325,1575,1800,2150,2375],[1575,1850,2125,2525,2825]],[[825,975,1100,1300,1425],[950,1125,1275,1525,1675],[1125,1325,1500,1800,1975],[1325,1550,1775,2125,2350],[1550,1825,2100,2500,2775],[1825,2150,2475,2950,3275]]],"wind":{"hw_kts":[0,5,10,15,20],"hw_mult":[1.0,0.92,0.85,0.78,0.72],"tw_kts":[0,2,5,10],"tw_mult":[1.0,1.12,1.3,1.6]},"gradient":{"up_pct":[0,1,2,3,4],"up_mult":[1.0,1.15,1.3,1.45,1.6],"dn_pct":[0,1,2],"dn_mult":[1.0,0.9,0.8]},"units":"ft"},"over_50":{"weights":[2700,2900,3100,3368],"alts":[0,2000,4000,6000,8000,10000],"oats":[-20,0,15,30,40],"distance_ft":[[[1125,1300,1475,1725,1900],[1250,1475,1675,1975,2200],[1475,1725,1950,2300,2550],[1725,2000,2275,2700,2975],[2000,2350,2650,3150,3500],[2350,2725,3125,3700,4100]],[[1275,1450,1650,1925,2125],[1425,1650,1900,2225,2475],[1650,1925,2200,2600,2875],[1925,2250,2575,3050,3350],[2250,2650,3000,3550,3950],[2650,3075,3525,4175,4625]],[[1400,1625,1850,2150,2375],[1575,1850,2100,2475,2750],[1850,2150,2475,2900,3200],[2150,2500,2850,3400,3750],[2500,2950,3350,3950,4400],[2950,3425,3925,4675,5150]],[[1600,1850,2100,2450,2700],[1800,2100,2400,2825,3125],[2100,2450,2800,3300,3650],[2450,2850,3250,3850,4250],[2850,3350,3800,4500,5000],[3350,3900,4450,5300,5850]]],"wind":{"hw_kts":[0,5,10,15,20],"hw_mult":[1.0,0.93,0.87,0.81,0.76],"tw_kts":[0,2,5],"tw_mult":[1.0,1.1,1.24]},"gradient":{"up_pct":[0,1,2,3,4],"up_mult":[1.0,1.1,1.2,1.32,1.44],"dn_pct":[0,1,2],"dn_mult":[1.0,0.92,0.85]},"units":"ft"},"example_chart":{"oat_c":24,"pa_ft":1000,"weight_lb":3100,"hw_kt":10,"grad_up_pct":2,"ground_roll_ft":1300,"over_50_ft":2300}},"landing":{"figure_ground_roll":"5-70","figure_over_50":"5-71","conditions":{"runway":"Paved, dry surface","power":"Idle","gear":"Down","flaps":"Full down 33\u00b0","braking":"Maximum","max_demonstrated_xwind_kt":18,"note":"M20TN paved landing charts (Sec V 5-70/5-71); flap seals as equipped","speeds_kias":{"3200":{"apr":75,"brk":59},"3000":{"apr":72,"brk":58},"2800":{"apr":70,"brk":56},"2600":{"apr":67,"brk":54}},"approach_speed_note":"For every knot over the listed approach speed add 100 ft to the landing distance"},"ground_roll":{"weights":[2600,2800,3000,3200],"alts":[0,2000,4000,6000,8000,10000],"oats":[-20,0,15,30,40],"distance_ft":[[[1150,1275,1400,1550,1675],[1275,1400,1525,1725,1850],[1400,1525,1700,1900,2050],[1525,1700,1875,2125,2300],[1675,1875,2050,2375,2550],[1850,2050,2275,2625,2825]],[[1250,1375,1500,1675,1775],[1350,1500,1650,1825,2000],[1475,1650,1800,2050,2200],[1625,1800,2000,2275,2450],[1775,2000,2200,2525,2725],[2000,2200,2425,2800,3000]],[[1325,1450,1575,1750,1900],[1425,1575,1725,1950,2075],[1550,1725,1925,2150,2350],[1725,1925,2100,2400,2600],[1900,2100,2350,2675,2875],[2075,2350,2575,2950,3200]],[[1400,1525,1675,1850,2000],[1500,1675,1825,2050,2200],[1650,1825,2025,2275,2450],[1800,2025,2225,2525,2725],[2000,2225,2450,2800,3025],[2200,2450,2700,3100,3350]]],"wind":{"hw_kts":[0,5,10,15,20],"hw_mult":[1.0,0.94,0.88,0.83,0.78],"tw_kts":[0,2,5,10],"tw_mult":[1.0,1.08,1.2,1.42]},"gradient":{"up_pct":[0,1,2,3,4],"up_mult":[1.0,0.95,0.9,0.85,0.8],"dn_pct":[0,1,2],"dn_mult":[1.0,1.1,1.22]},"units":"ft"},"over_50":{"weights":[2600,2800,3000,3200],"alts":[0,2000,4000,6000,8000,10000],"oats":[-20,0,15,30,40],"distance_ft":[[[1850,2075,2225,2500,2675],[2000,2225,2400,2725,2900],[2175,2400,2650,2975,3225],[2375,2675,2900,3300,3575],[2625,2950,3275,3700,4025],[2900,3300,3625,4150,4525]],[[1950,2175,2350,2625,2800],[2075,2325,2525,2850,3050],[2250,2525,2775,3125,3375],[2475,2800,3050,3475,3725],[2750,3100,3425,3875,4200],[3050,3475,3800,4325,4750]],[[2025,2250,2450,2725,2900],[2175,2425,2625,2950,3175],[2350,2625,2875,3250,3500],[2600,2900,3175,3600,3900],[2875,3225,3550,4050,4375],[3175,3600,3975,4525,4925]],[[2125,2350,2550,2850,3025],[2250,2525,2750,3075,3325],[2450,2750,3000,3400,3650],[2700,3025,3325,3750,4075],[2975,3375,3700,4200,4575],[3325,3750,4150,4725,5150]]],"wind":{"hw_kts":[0,5,10,15,20],"hw_mult":[1.0,0.96,0.92,0.88,0.85],"tw_kts":[0,2,5],"tw_mult":[1.0,1.07,1.16]},"gradient":{"up_pct":[0,1,2,3,4],"up_mult":[1.0,0.97,0.94,0.91,0.88],"dn_pct":[0,1,2],"dn_mult":[1.0,1.04,1.06]},"units":"ft"},"example_chart":{"oat_c":24,"pa_ft":1000,"weight_lb":2800,"hw_kt":10,"grad_up_pct_gr":2,"grad_dn_pct_over50":2,"ground_roll_ft":1330,"over_50_ft":2550}}},"toSpeeds":[{"w":2700,"to":65,"s50":75},{"w":2900,"to":69,"s50":78},{"w":3100,"to":72,"s50":80},{"w":3368,"to":77,"s50":84}],"ldgChart":[{"w":2600,"apr":67,"brk":54},{"w":2800,"apr":70,"brk":56},{"w":3000,"apr":72,"brk":58},{"w":3200,"apr":75,"brk":59}],"grassPending":true,"grassPendingNote":"POH grass figures 5-18/5-19 (TO) and 5-72/5-73 (LDG) are PENDING DATA \u2014 surface factor is non-POH ops only; do not treat as AFM grass performance."}};
+  const MODEL_LS_KEY = 'm20-wandb-model';
+
+  // Active profile bindings (mutated by applyModel; BEW/empty-arm inputs are never overwritten)
+  let activeModelId = 'M20V';
+  let P = MODEL_PROFILES.M20V;
+  let MAX_TOW = P.maxTOW;
+  let MAX_LW = P.maxLW;
+  let BAG_MAX = P.bagMax;
+  let HAT_MAX = P.hatMax;
+  let FUEL_ARM = P.fuelArm;
+  let REAR_ARM = P.rearArm;
+  let BAG_ARM = P.bagArm;
+  let HAT_ARM = P.hatArm;
+  let TKS_ARM = P.tksArm;
+  let TKS_MAX_GAL = P.tksMaxGal;
+  let FRONT_ARMS = P.frontArms;
+  let ENVELOPE = P.envelope;
+  let TO_SPEEDS = P.toSpeeds;
+  let LDG_CHART = P.ldgChart;
+  let DIST = P.dist;
+  let CRUISE = P.cruise;
+  let CRUISE_OAT_CORR = P.cruiseOatCorrPer10C;
+
   const LB_PER_KG = 2.2046226218;
   const IN_PER_MM = 0.0393700787;
   const L_PER_GAL = 3.785411784;
-
-  // Takeoff speed schedule (KIAS) from Figs 5-17/5-18
-  const TO_SPEEDS = [
-    { w: 2700, to: 65, s50: 75 },
-    { w: 2900, to: 69, s50: 78 },
-    { w: 3100, to: 72, s50: 80 },
-    { w: 3368, to: 77, s50: 84 }
-  ];
-  // Landing chart approach/brake (Figs 5-71/5-72)
-  const LDG_CHART = [
-    { w: 2600, apr: 69, brk: 55 },
-    { w: 2800, apr: 72, brk: 57 },
-    { w: 3000, apr: 74, brk: 59 },
-    { w: 3200, apr: 77, brk: 61 }
-  ];
-
-  // Digitized POH distance nomograms (Figs 5-17/5-18, 5-71/5-72)
-  const DIST = {"aircraft":"Mooney M20V Acclaim Ultra","source":"AFM/POH Section V Original Issue 03-16-2017","disclaimer":"Digitized approximations of POH nomograms for planning/training only. AFM/POH chart governs. Typical visual-read uncertainty \u00b150\u2013100 ft; verify critical ops on the paper chart.","notes":["to-117.png is Stall Speed vs Angle of Bank \u2014 not used for distances.","Takeoff: Fig 5-17 ground roll (to-118.png); Fig 5-18 over 50' (to-119.png).","Landing: Fig 5-71 ground roll (ldg-172.png); Fig 5-72 over 50' (ldg-173.png).","Landing charts note '(1) M20TN, flap seals installed'.","Hard anchors: manufacturer SL ISA over-50 TO 2100 ft @3368, LDG 2650 ft @3200.","Hard anchors: chart examples TO 24C/1000/3100/10HW/2%up \u2192 GR 1300 / over50 2300; LDG 24C/1000/2800/10HW/2%up \u2192 GR 1430; LDG over50 24C/1000/2800/10HW/2%down \u2192 2650.","Base grids are 0 wind / 0% gradient at each weight\u00d7alt\u00d7OAT; wind and gradient applied as multiplicative corrections from chart fans.","Webapp assumes 0% runway gradient unless a gradient control is added; surface factor is optional non-POH multiplier.","Humidity >80% RH: POH allows up to +10% on takeoff \u2014 not auto-applied.","Landing: +100 ft per knot over chart approach speed \u2014 advisory only, not auto-applied."],"takeoff":{"figure_ground_roll":"5-17","figure_over_50":"5-18","conditions":{"runway":"Paved, dry surface","power":"Full prior to brake release","gear":"Down","flaps":"10\u00b0","relative_humidity":"80%","humidity_note":"Humidity in excess of 80% R.H. can add up to 10% to the takeoff distance","speeds_kias":{"3368":{"to":77,"s50":84},"3100":{"to":72,"s50":80},"2900":{"to":69,"s50":78},"2700":{"to":65,"s50":75}}},"ground_roll":{"weights":[2700,2900,3100,3368],"alts":[0,2000,4000,6000,8000,10000],"oats":[-20,0,15,30,40],"distance_ft":[[[550,650,725,850,950],[625,750,850,1000,1100],[750,875,1000,1200,1300],[875,1025,1175,1400,1550],[1025,1200,1375,1650,1825],[1200,1425,1625,1950,2150]],[[625,750,825,1000,1075],[725,850,975,1150,1275],[850,1000,1150,1375,1500],[1000,1175,1350,1625,1775],[1175,1375,1600,1900,2100],[1375,1625,1875,2250,2500]],[[700,850,950,1125,1225],[825,975,1100,1300,1450],[975,1150,1300,1550,1700],[1150,1325,1525,1825,2025],[1325,1575,1800,2150,2375],[1575,1850,2125,2525,2825]],[[825,975,1100,1300,1425],[950,1125,1275,1525,1675],[1125,1325,1500,1800,1975],[1325,1550,1775,2125,2350],[1550,1825,2100,2500,2775],[1825,2150,2475,2950,3275]]],"wind":{"hw_kts":[0,5,10,15,20],"hw_mult":[1.0,0.92,0.85,0.78,0.72],"tw_kts":[0,2,5,10],"tw_mult":[1.0,1.12,1.3,1.6]},"gradient":{"up_pct":[0,1,2,3,4],"up_mult":[1.0,1.15,1.3,1.45,1.6],"dn_pct":[0,1,2],"dn_mult":[1.0,0.9,0.8]},"units":"ft"},"over_50":{"weights":[2700,2900,3100,3368],"alts":[0,2000,4000,6000,8000,10000],"oats":[-20,0,15,30,40],"distance_ft":[[[1125,1300,1475,1725,1900],[1250,1475,1675,1975,2200],[1475,1725,1950,2300,2550],[1725,2000,2275,2700,2975],[2000,2350,2650,3150,3500],[2350,2725,3125,3700,4100]],[[1275,1450,1650,1925,2125],[1425,1650,1900,2225,2475],[1650,1925,2200,2600,2875],[1925,2250,2575,3050,3350],[2250,2650,3000,3550,3950],[2650,3075,3525,4175,4625]],[[1400,1625,1850,2150,2375],[1575,1850,2100,2475,2750],[1850,2150,2475,2900,3200],[2150,2500,2850,3400,3750],[2500,2950,3350,3950,4400],[2950,3425,3925,4675,5150]],[[1600,1850,2100,2450,2700],[1800,2100,2400,2825,3125],[2100,2450,2800,3300,3650],[2450,2850,3250,3850,4250],[2850,3350,3800,4500,5000],[3350,3900,4450,5300,5850]]],"wind":{"hw_kts":[0,5,10,15,20],"hw_mult":[1.0,0.93,0.87,0.81,0.76],"tw_kts":[0,2,5],"tw_mult":[1.0,1.1,1.24]},"gradient":{"up_pct":[0,1,2,3,4],"up_mult":[1.0,1.1,1.2,1.32,1.44],"dn_pct":[0,1,2],"dn_mult":[1.0,0.92,0.85]},"units":"ft"},"example_chart":{"oat_c":24,"pa_ft":1000,"weight_lb":3100,"hw_kt":10,"grad_up_pct":2,"ground_roll_ft":1300,"over_50_ft":2300}},"landing":{"figure_ground_roll":"5-71","figure_over_50":"5-72","conditions":{"runway":"Paved, dry surface","power":"Idle","gear":"Down","flaps":"Full down 33\u00b0","braking":"Maximum","max_demonstrated_xwind_kt":18,"note":"M20TN, flap seals installed","speeds_kias":{"3200":{"apr":77,"brk":61},"3000":{"apr":74,"brk":59},"2800":{"apr":72,"brk":57},"2600":{"apr":69,"brk":55}},"approach_speed_note":"For every knot over the listed approach speed add 100 ft to the landing distance"},"ground_roll":{"weights":[2600,2800,3000,3200],"alts":[0,2000,4000,6000,8000,10000],"oats":[-20,0,15,30,40],"distance_ft":[[[1250,1375,1500,1675,1800],[1375,1500,1650,1850,2000],[1500,1650,1825,2050,2225],[1650,1825,2025,2300,2475],[1800,2025,2225,2550,2750],[2000,2225,2450,2825,3050]],[[1350,1475,1625,1800,1925],[1450,1625,1775,1975,2150],[1600,1775,1950,2200,2375],[1750,1950,2150,2450,2650],[1925,2150,2375,2725,2950],[2150,2375,2625,3025,3250]],[[1425,1575,1700,1900,2050],[1550,1700,1875,2100,2250],[1675,1875,2075,2325,2525],[1850,2075,2275,2600,2800],[2050,2275,2525,2875,3100],[2250,2525,2775,3175,3450]],[[1500,1650,1800,2000,2150],[1625,1800,1975,2200,2375],[1775,1975,2175,2450,2650],[1950,2175,2400,2725,2950],[2150,2400,2650,3025,3275],[2375,2650,2925,3350,3625]]],"wind":{"hw_kts":[0,5,10,15,20],"hw_mult":[1.0,0.94,0.88,0.83,0.78],"tw_kts":[0,2,5,10],"tw_mult":[1.0,1.08,1.2,1.42]},"gradient":{"up_pct":[0,1,2,3,4],"up_mult":[1.0,0.95,0.9,0.85,0.8],"dn_pct":[0,1,2],"dn_mult":[1.0,1.1,1.22]},"units":"ft"},"over_50":{"weights":[2600,2800,3000,3200],"alts":[0,2000,4000,6000,8000,10000],"oats":[-20,0,15,30,40],"distance_ft":[[[1925,2150,2325,2600,2775],[2075,2300,2500,2825,3025],[2250,2500,2750,3100,3350],[2475,2775,3025,3425,3725],[2725,3075,3400,3850,4175],[3025,3425,3775,4300,4700]],[[2025,2250,2450,2725,2900],[2150,2425,2625,2950,3175],[2350,2625,2875,3250,3500],[2575,2900,3175,3600,3875],[2850,3225,3550,4025,4375],[3175,3600,3950,4500,4925]],[[2100,2350,2550,2825,3025],[2250,2525,2725,3075,3300],[2450,2725,3000,3375,3650],[2700,3025,3300,3750,4050],[2975,3350,3700,4200,4550],[3300,3750,4125,4700,5125]],[[2200,2450,2650,2950,3150],[2350,2625,2850,3200,3450],[2550,2850,3125,3525,3800],[2800,3150,3450,3900,4225],[3100,3500,3850,4375,4750],[3450,3900,4300,4900,5350]]],"wind":{"hw_kts":[0,5,10,15,20],"hw_mult":[1.0,0.96,0.92,0.88,0.85],"tw_kts":[0,2,5],"tw_mult":[1.0,1.07,1.16]},"gradient":{"up_pct":[0,1,2,3,4],"up_mult":[1.0,0.97,0.94,0.91,0.88],"dn_pct":[0,1,2],"dn_mult":[1.0,1.04,1.06]},"units":"ft"},"example_chart":{"oat_c":24,"pa_ft":1000,"weight_lb":2800,"hw_kt":10,"grad_up_pct_gr":2,"grad_dn_pct_over50":2,"ground_roll_ft":1430,"over_50_ft":2650}}};
 
   function distBracket(xs, x) {
     if (x <= xs[0]) return [0, 0, 0];
@@ -1173,8 +1215,6 @@
     return { ft: Math.round(ft / 5) * 5, oob: r.oob, notes };
   }
 
-
-  const CRUISE = {"cols":[[2500,30.5],[2500,29.0],[2500,26.0],[2500,22.0],[2400,30.5],[2400,27.0],[2400,24.0],[2400,21.0],[2300,28.0],[2300,25.0],[2300,22.0],[2300,19.0],[2200,21.0]],"bestPower":[{"alt":0,"stdC":15,"ff":[21.4,20.6,18.7,16.1,20.4,18.0,15.8,13.4,17.8,15.5,13.1,10.5,11.0]},{"alt":2000,"stdC":11,"ff":[21.4,20.5,18.7,16.0,20.4,18.1,16.0,13.7,17.9,15.9,13.9,11.7,12.5]},{"alt":4000,"stdC":7,"ff":[21.3,20.4,18.6,15.9,20.3,18.1,16.1,14.0,17.9,16.0,14.0,11.9,12.5]},{"alt":6000,"stdC":3,"ff":[21.3,20.4,18.5,15.8,20.3,18.2,16.2,14.2,17.8,16.0,14.0,12.0,12.5]},{"alt":8000,"stdC":-1,"ff":[21.2,20.3,18.4,15.8,20.2,18.2,16.3,14.4,17.8,16.0,14.1,12.1,12.5]},{"alt":10000,"stdC":-5,"ff":[21.1,20.2,18.3,15.7,20.2,18.2,16.4,14.5,17.8,16.0,14.1,12.1,12.4]},{"alt":12000,"stdC":-9,"ff":[21.1,20.1,18.2,15.7,20.2,18.2,16.4,14.5,17.8,16.0,14.1,12.2,12.4]},{"alt":14000,"stdC":-13,"ff":[21.0,20.1,18.2,15.6,20.2,18.1,16.3,14.5,17.8,15.9,14.1,12.2,12.4]},{"alt":16000,"stdC":-17,"ff":[21.0,20.0,18.1,15.6,20.2,18.1,16.3,14.5,17.8,15.9,14.1,12.2,12.4]},{"alt":18000,"stdC":-21,"ff":[21.0,20.0,18.1,15.6,20.2,18.0,16.2,14.5,17.8,15.9,14.1,12.3,12.5]},{"alt":20000,"stdC":-25,"ff":[20.9,19.9,18.0,15.6,20.2,18.0,16.2,14.4,17.7,15.9,14.1,12.3,12.6]},{"alt":22000,"stdC":-29,"ff":[20.9,19.9,18.0,15.6,20.2,17.9,16.2,14.5,17.7,15.9,14.1,12.4,12.7]},{"alt":24000,"stdC":-33,"ff":[20.9,19.9,18.0,15.7,20.1,17.9,16.2,14.5,17.7,15.9,14.2,12.6,12.8]},{"alt":25000,"stdC":-35,"ff":[20.9,19.9,18.0,15.7,20.1,17.9,16.2,14.6,17.6,15.9,14.2,12.7,12.8]}],"bestEconomy":[{"alt":0,"stdC":15,"ff":[18.5,17.8,16.2,13.8,17.7,15.6,13.7,11.5,15.5,13.5,11.3,9.7,10.8]},{"alt":2000,"stdC":11,"ff":[18.4,17.7,16.1,13.8,17.6,15.7,13.8,11.8,15.6,13.9,12.0,10.0,10.9]},{"alt":4000,"stdC":7,"ff":[18.4,17.6,16.1,13.7,17.6,15.7,14.0,12.1,15.5,13.9,12.1,10.2,10.9]},{"alt":6000,"stdC":3,"ff":[18.3,17.5,16.0,13.6,17.5,15.7,14.1,12.3,15.5,13.9,12.2,10.3,10.9]},{"alt":8000,"stdC":-1,"ff":[18.2,17.5,15.9,13.6,17.5,15.7,14.1,12.4,15.5,13.9,12.2,10.4,10.8]},{"alt":10000,"stdC":-5,"ff":[18.1,17.4,15.8,13.5,17.4,15.7,14.2,12.5,15.5,13.9,12.2,10.4,10.8]},{"alt":12000,"stdC":-9,"ff":[18.1,17.3,15.7,13.5,17.4,15.7,14.2,12.5,15.5,13.9,12.2,10.5,10.8]},{"alt":14000,"stdC":-13,"ff":[18.1,17.3,15.7,13.5,17.4,15.7,14.1,12.5,15.5,13.9,12.2,10.5,10.8]},{"alt":16000,"stdC":-17,"ff":[18.1,17.3,15.6,13.5,17.4,15.6,14.1,12.5,15.5,13.9,12.2,10.5,10.8]},{"alt":18000,"stdC":-21,"ff":[18.0,17.2,15.6,13.5,17.4,15.6,14.1,12.5,15.5,13.9,12.2,10.6,10.9]},{"alt":20000,"stdC":-25,"ff":[18.1,17.2,15.6,13.5,17.5,15.6,14.0,12.5,15.5,13.8,12.3,10.6,11.0]},{"alt":22000,"stdC":-29,"ff":[18.1,17.2,15.6,13.5,17.5,15.6,14.0,12.5,15.4,13.8,12.3,10.7,11.1]},{"alt":24000,"stdC":-33,"ff":[18.1,17.2,15.6,13.5,17.5,15.6,14.0,12.6,15.4,13.8,12.3,10.9,11.1]},{"alt":25000,"stdC":-35,"ff":[18.1,17.2,15.6,13.5,17.5,15.6,14.1,12.7,15.4,13.8,12.4,11.0,11.2]}]};
 
   let wu = 'lb', lu = 'in', fu = 'gal';
   let lastTotalLb = 0;
@@ -1610,6 +1650,8 @@
 
   function lookupFf(tableRows, colIdx, alt) {
     const rows = tableRows.map(r => ({ alt: r.alt, stdC: r.stdC, ff: r.ff[colIdx] }));
+    // Null cells = POH blank (setting not attainable) — propagate
+
     if (alt <= rows[0].alt) return { ff: rows[0].ff, stdC: rows[0].stdC };
     if (alt >= rows[rows.length - 1].alt) {
       const last = rows[rows.length - 1];
@@ -1619,7 +1661,7 @@
       const a = rows[i], b = rows[i + 1];
       if (alt >= a.alt && alt <= b.alt) {
         return {
-          ff: lerp(alt, a.alt, a.ff, b.alt, b.ff),
+          ff: (a.ff == null || b.ff == null) ? null : lerp(alt, a.alt, a.ff, b.alt, b.ff),
           stdC: lerp(alt, a.alt, a.stdC, b.alt, b.stdC)
         };
       }
@@ -1646,12 +1688,12 @@
     const { ff, stdC } = lookupFf(table, colIdx, alt);
     const isaDev = oat - stdC;
     // Note 3: decrease 0.5 gph per 10°C above std; Note 4: increase 0.5 per 10°C below
-    const corr = ff - 0.5 * (isaDev / 10);
+    const corr = (ff == null || Number.isNaN(ff)) ? NaN : (ff - CRUISE_OAT_CORR * (isaDev / 10));
     $('crStdOat').textContent = fmt(stdC, 1);
     $('crIsaDev').textContent = (isaDev >= 0 ? '+' : '') + fmt(isaDev, 1);
-    $('crFfStd').textContent = fmt(ff, 1);
-    $('crFfCorr').textContent = fmt(corr, 1);
-    $('crFfLb').textContent = fmt(corr * 6.0, 0);
+    $('crFfStd').textContent = (ff == null || Number.isNaN(ff)) ? 'N/A' : fmt(ff, 1);
+    $('crFfCorr').textContent = (corr == null || Number.isNaN(corr)) ? 'N/A' : fmt(corr, 1);
+    $('crFfLb').textContent = (corr == null || Number.isNaN(corr)) ? '—' : fmt(corr * 6.0, 0);
     $('crSetting').textContent = rpm + ' / ' + mp.toFixed(1);
 
     const pills = $('crPills');
@@ -1760,7 +1802,121 @@
 
   window.addEventListener('resize', () => calc());
 
+
+  function applyModel(id, opts) {
+    opts = opts || {};
+    if (!MODEL_PROFILES[id]) id = 'M20V';
+    activeModelId = id;
+    P = MODEL_PROFILES[id];
+    MAX_TOW = P.maxTOW;
+    MAX_LW = P.maxLW;
+    BAG_MAX = P.bagMax;
+    HAT_MAX = P.hatMax;
+    FUEL_ARM = P.fuelArm;
+    REAR_ARM = P.rearArm;
+    BAG_ARM = P.bagArm;
+    HAT_ARM = P.hatArm;
+    TKS_ARM = P.tksArm;
+    TKS_MAX_GAL = P.tksMaxGal;
+    FRONT_ARMS = P.frontArms;
+    ENVELOPE = P.envelope;
+    TO_SPEEDS = P.toSpeeds;
+    LDG_CHART = P.ldgChart;
+    DIST = P.dist;
+    CRUISE = P.cruise;
+    CRUISE_OAT_CORR = P.cruiseOatCorrPer10C;
+
+    // Chrome / labels (do NOT touch BEW / empty-arm input values)
+    const sub = $('appSubtitle');
+    if (sub) sub.textContent = P.label + ' · ' + P.engine + ' · Max TOW ' + P.maxTOW + ' lb · MLW ' + P.maxLW + ' lb · Training aid';
+    const meta = $('modelMeta');
+    if (meta) meta.textContent = P.engineNote + ' · ' + P.prop + ' · ' + P.poh;
+    const bm = $('pohBannerModel');
+    if (bm) bm.textContent = P.label;
+    const ms = $('modelSelect');
+    if (ms && ms.value !== id) ms.value = id;
+
+    const toFigs = P.toFigLabel.split(' / ');
+    const ldgFigs = P.ldgFigLabel.split(' / ');
+    const setTxt = (eid, t) => { const el = $(eid); if (el) el.textContent = t; };
+    setTxt('toSpeedFigLabel', 'KIAS (Fig ' + P.toFigLabel + ' schedule)');
+    setTxt('toGrFigLabel', 'ft · Fig ' + toFigs[0] + ' digitized');
+    setTxt('to50FigLabel', 'ft · Fig ' + (toFigs[1] || toFigs[0]) + ' digitized');
+    setTxt('ldgSpeedFigLabel', 'KIAS (Fig ' + P.ldgFigLabel + ' table)');
+    setTxt('ldgGrFigLabel', 'ft · Fig ' + ldgFigs[0] + ' digitized');
+    setTxt('ldg50FigLabel', 'ft · Fig ' + (ldgFigs[1] || ldgFigs[0]) + ' digitized');
+    setTxt('footerDistFigs', 'Figs ' + P.toFigLabel + ', ' + P.ldgFigLabel);
+    setTxt('footerCruisePages', P.cruisePohPages);
+    setTxt('footerFrontArms', P.frontArmsNote.replace(' in (Sec VI sample/graph)', '').replace(' in (Sec VI graph/sample — not M20V arms)', '') + ' in');
+    setTxt('footerEngine', P.engineShort);
+    setTxt('footerProp', P.prop);
+    setTxt('footerModel', P.label);
+    setTxt('footerPoh', P.poh);
+    const corrStr = String(P.cruiseOatCorrPer10C);
+    setTxt('cruiseOatCorrVal', corrStr);
+    setTxt('cruiseOatCorrVal2', corrStr);
+    const oatNote = $('cruiseOatNote');
+    if (oatNote) {
+      oatNote.innerHTML = '<strong>Note 3–4:</strong> Decrease FF ' + corrStr + ' gph per 10°C above std; increase ' + corrStr + ' gph per 10°C below std.';
+    }
+
+    // Grass pending note for TN when grass surface selected (or always soft-warn)
+    const gpn = $('grassPendingNote');
+    if (gpn) {
+      const surfEl = $('toSurface');
+      const surf = surfEl ? parseFloat(surfEl.value) : 1;
+      const grassLike = surf > 1.0;
+      if (P.grassPending && grassLike) {
+        gpn.textContent = P.grassPendingNote;
+        gpn.classList.add('show');
+      } else if (P.grassPending) {
+        gpn.textContent = 'M20TN: POH grass TO/LDG figures (5-18/5-19, 5-72/5-73) are PENDING DATA. Paved digitized charts are active; surface factor is non-POH ops only.';
+        gpn.classList.add('show');
+      } else {
+        gpn.textContent = '';
+        gpn.classList.remove('show');
+      }
+    }
+
+    if (opts.persist !== false) {
+      try { localStorage.setItem(MODEL_LS_KEY, id); } catch (e) {}
+    }
+
+    // Refresh seat arm labels + all calcs (preserves BEW / empty arm field values)
+    if (typeof updateUnitLabels === 'function') updateUnitLabels();
+    if (typeof populateMp === 'function') populateMp();
+    if (typeof calc === 'function') calc();
+    if (typeof calcTakeoff === 'function') calcTakeoff();
+    if (typeof calcLanding === 'function') calcLanding();
+    if (typeof calcCruise === 'function') calcCruise();
+  }
+
+  // Restore model from localStorage (default M20V); does not overwrite BEW/empty arm
+  (function initModel() {
+    let saved = 'M20V';
+    try {
+      const s = localStorage.getItem(MODEL_LS_KEY);
+      if (s && MODEL_PROFILES[s]) saved = s;
+    } catch (e) {}
+    const sel = $('modelSelect');
+    if (sel) {
+      sel.value = saved;
+      sel.addEventListener('change', function () {
+        applyModel(sel.value);
+      });
+    }
+    const surf = $('toSurface');
+    if (surf) {
+      surf.addEventListener('change', function () {
+        applyModel(activeModelId, { persist: false });
+      });
+    }
+    applyModel(saved, { persist: false });
+  })();
+
+  // applyModel triggers calcs; keep populateMp for safety
   populateMp();
+
   updateUnitLabels();
   calc();
   calcTakeoff();
