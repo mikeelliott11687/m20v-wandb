@@ -126,6 +126,6 @@ Each `MODEL_PROFILES` entry carries `ac: { available, weightLb: 66.1, armIn: 59.
 
 - Two GW toggles: **M20J_2740** and **M20J_2900**.
 - **M20J_2740:** Manual **1229** ISSUED 9-6-83 (2740 lb). NORMAL landing **5-31** digitized (anchor 15°C/1500/2500/6HW → 860/1860). TO tabular from Manual 1221 family, validated vs 1229 nomogram 5-13. Cruise 5-20/5-21.
-- **M20J_2900:** Manual 3203 Rev B — cruise/TO digitized; landing still PENDING.
+- **M20J_2900:** Manual 3203 Rev B — cruise/TO digitized; NORMAL paved landing **5-34** digitized (anchor 20°C/2000/2600/6HW → 975/2005); grass 5-35 anchors only.
 - **Est. LOP HP = 13.9 × GPH** (training rule-of-thumb; not POH % power).
 - BEW/empty arm never overwritten on model switch.
