@@ -736,10 +736,10 @@
             <label for="tksVol">TKS fluid</label>
             <div class="field fuel-mode">
               <span class="arm-tag">arm 70.7 · max 6.0 gal</span>
-              <input type="number" id="tksVol" min="0" step="0.1" value="0" />
+              <input type="number" id="tksVol" min="0" max="6" step="0.1" value="0" />
               <span class="unit" id="tksVolUnit">gal</span>
             </div>
-            <span class="hint">Optional CAV TKS (equip list 21J). Full = 6.0 gal / 55.2 lb @ arm 70.7 in. Dry system weight is in BEW.</span>
+            <span class="hint">Optional CAV/FIKI TKS (equip list 21J). Max 6.0 gal / 55.2 lb @ arm 70.7 in. Dry system weight is in BEW.</span>
           </div>
           <div class="row">
             <label for="tksDensity">TKS fluid density</label>
@@ -1291,6 +1291,21 @@
     if (currentDensMode() === 'kgl') return v * L_PER_GAL * LB_PER_KG;
     return v;
   }
+  function tksMaxInDisplayUnits() {
+    return fu === 'L' ? +(TKS_MAX_GAL * L_PER_GAL).toFixed(1) : TKS_MAX_GAL;
+  }
+  function clampTksVol() {
+    const el = $('tksVol');
+    if (!el) return;
+    const maxU = tksMaxInDisplayUnits();
+    el.max = String(maxU);
+    el.min = '0';
+    let v = parseFloat(el.value);
+    if (!Number.isFinite(v) || v < 0) v = 0;
+    if (v > maxU) v = maxU;
+    // keep one decimal for gal / L display consistency
+    el.value = String(Math.round(v * 10) / 10);
+  }
   function fmt(v, d) {
     if (!Number.isFinite(v)) return '—';
     return v.toFixed(d);
@@ -1354,6 +1369,7 @@
     document.querySelectorAll('[data-lu]').forEach(el => { el.textContent = lu; });
     $('fuelVolUnit').textContent = fu === 'L' ? 'L' : 'gal';
     $('tksVolUnit').textContent = fu === 'L' ? 'L' : 'gal';
+    clampTksVol();
     $('densUnit').textContent = currentDensMode() === 'kgl' ? 'kg/L' : 'lb/gal';
     $('tksDensUnit').textContent = currentDensMode() === 'kgl' ? 'kg/L' : 'lb/gal';
     $('outTotalSub').textContent = 'of ' + fmtWt(MAX_TOW) + ' ' + wu + ' max TO';
@@ -1442,6 +1458,7 @@
     const gal = fuelVolToGal(n('fuelVol'));
     const dens = densToLbPerGal(n('fuelDensity'));
     const fuelW = gal * dens;
+    clampTksVol();
     const tksGal = fuelVolToGal(n('tksVol'));
     const tksDens = densToLbPerGal(n('tksDensity'));
     const tksW = tksGal * tksDens;
@@ -1910,6 +1927,7 @@
     HAT_ARM = P.hatArm;
     TKS_ARM = P.tksArm;
     TKS_MAX_GAL = P.tksMaxGal;
+    clampTksVol();
     FRONT_ARMS = P.frontArms;
     ENVELOPE = P.envelope;
     TO_SPEEDS = P.toSpeeds;
@@ -2059,6 +2077,10 @@
       const s = localStorage.getItem(MODEL_LS_KEY);
       if (s && MODEL_PROFILES[s]) saved = s;
     } catch (e) {}
+
+  $('tksVol').addEventListener('input', function () { clampTksVol(); });
+  $('tksVol').addEventListener('change', function () { clampTksVol(); });
+
     const sel = $('modelSelect');
     if (sel) {
       sel.value = saved;
