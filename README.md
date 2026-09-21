@@ -58,8 +58,9 @@ Paths are relative (`./`) so GitHub Pages works at repo root or a subpath like `
 ## Features
 
 ### Weight & Balance (unchanged core)
-- Inputs: BEW + empty arm; pilot/copilot + FWD/MID/AFT; rear L/R; fuel + density; baggage; hat rack
-- Arms: front 37 / 40.25 / 43.5; rear 73; fuel 49.23; baggage 101.5; hat rack 126
+- Inputs: BEW + empty arm; pilot/copilot + FWD/MID/AFT; rear L/R; fuel + density; **TKS fluid (CAV)** + density; baggage; hat rack
+- Arms: front 37 / 40.25 / 43.5; rear 73; fuel 49.23; TKS 70.7; baggage 101.5; hat rack 126
+- TKS (optional, equip list 21J): 0–6.0 gal @ 9.2 lb/gal default → full 55.2 lb @ arm 70.7 in
 - Outputs: station table, total weight, CG, useful load, CG envelope plot
 - Limits: max TOW **3368 lb**, MLW **3200 lb**, baggage 120, hat rack 10
 - Dual units: lb/kg, in/mm, gal/litres

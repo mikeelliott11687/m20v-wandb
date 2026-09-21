@@ -628,6 +628,34 @@
         </div>
 
         <div class="card">
+          <h2>TKS fluid (CAV)</h2>
+          <div class="row">
+            <label for="tksVol">TKS fluid</label>
+            <div class="field fuel-mode">
+              <span class="arm-tag">arm 70.7 · max 6.0 gal</span>
+              <input type="number" id="tksVol" min="0" step="0.1" value="0" />
+              <span class="unit" id="tksVolUnit">gal</span>
+            </div>
+            <span class="hint">Optional CAV TKS (equip list 21J). Full = 6.0 gal / 55.2 lb @ arm 70.7 in. Dry system weight is in BEW.</span>
+          </div>
+          <div class="row">
+            <label for="tksDensity">TKS fluid density</label>
+            <div class="field">
+              <input type="number" id="tksDensity" min="0.1" step="0.01" value="9.2" />
+              <span class="unit" id="tksDensUnit">lb/gal</span>
+            </div>
+            <span class="hint">Default 9.2 lb/gal from POH 55.2 lb ÷ 6.0 gal.</span>
+          </div>
+          <div class="row">
+            <label>TKS weight (computed)</label>
+            <div class="field">
+              <strong id="tksWtDisp" style="font-family:var(--mono)">—</strong>
+              <span class="unit" data-wu>lb</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
           <h2>Baggage &amp; hat rack</h2>
           <div class="row">
             <label for="baggage">Baggage compartment</label>
@@ -1034,6 +1062,7 @@
       <p style="margin-bottom:0"><strong>Limits (POH Sec II):</strong>
         Max takeoff 3368 lb · Max landing 3200 lb ·
         Baggage 120 lb @ 101.5 · Hat rack 10 lb @ 126 ·
+        TKS fluid (opt.) 6.0 gal / 55.2 lb @ 70.7 ·
         Engine TSIO-550-G 280 BHP @ 2500 RPM · Rec. cruise 262 BHP.</p>
     </footer>
   </div>
@@ -1050,6 +1079,8 @@
   const REAR_ARM = 73;
   const BAG_ARM = 101.5;
   const HAT_ARM = 126;
+  const TKS_ARM = 70.7;
+  const TKS_MAX_GAL = 6.0;
   const FRONT_ARMS = { FWD: 37.0, MID: 40.25, AFT: 43.5 };
   const ENVELOPE = [
     { cg: 41.0, w: 2430 },
@@ -1227,7 +1258,9 @@
     document.querySelectorAll('[data-wu]').forEach(el => { el.textContent = wu; });
     document.querySelectorAll('[data-lu]').forEach(el => { el.textContent = lu; });
     $('fuelVolUnit').textContent = fu === 'L' ? 'L' : 'gal';
+    $('tksVolUnit').textContent = fu === 'L' ? 'L' : 'gal';
     $('densUnit').textContent = currentDensMode() === 'kgl' ? 'kg/L' : 'lb/gal';
+    $('tksDensUnit').textContent = currentDensMode() === 'kgl' ? 'kg/L' : 'lb/gal';
     $('outTotalSub').textContent = 'of ' + fmtWt(MAX_TOW) + ' ' + wu + ' max TO';
     $('outCGSub').textContent = (lu === 'mm' ? 'mm' : 'inches') + ' aft of datum';
     $('outMomentSub').textContent = momUnit();
@@ -1253,11 +1286,13 @@
 
   function convertDensityDisplay(fromMode, toMode) {
     if (fromMode === toMode) return;
-    const dens = $('fuelDensity');
-    const d = parseFloat(dens.value);
-    if (!Number.isFinite(d)) return;
-    if (fromMode === 'lbgal' && toMode === 'kgl') dens.value = (d / L_PER_GAL / LB_PER_KG).toFixed(2);
-    else if (fromMode === 'kgl' && toMode === 'lbgal') dens.value = (d * L_PER_GAL * LB_PER_KG).toFixed(2);
+    ['fuelDensity', 'tksDensity'].forEach(id => {
+      const dens = $(id);
+      const d = parseFloat(dens.value);
+      if (!Number.isFinite(d)) return;
+      if (fromMode === 'lbgal' && toMode === 'kgl') dens.value = (d / L_PER_GAL / LB_PER_KG).toFixed(2);
+      else if (fromMode === 'kgl' && toMode === 'lbgal') dens.value = (d * L_PER_GAL * LB_PER_KG).toFixed(2);
+    });
   }
 
   function convertAllInputs(kind, from, to) {
@@ -1285,13 +1320,13 @@
       }
     }
     if (kind === 'fuel' && from !== to) {
-      const el = $('fuelVol');
-      const v = parseFloat(el.value);
-      if (Number.isFinite(v)) {
-        const factor = from === 'gal' && to === 'L' ? L_PER_GAL
-                     : from === 'L' && to === 'gal' ? 1 / L_PER_GAL : 1;
-        el.value = (v * factor).toFixed(1);
-      }
+      const factor = from === 'gal' && to === 'L' ? L_PER_GAL
+                   : from === 'L' && to === 'gal' ? 1 / L_PER_GAL : 1;
+      ['fuelVol', 'tksVol'].forEach(id => {
+        const el = $(id);
+        const v = parseFloat(el.value);
+        if (Number.isFinite(v)) el.value = (v * factor).toFixed(1);
+      });
       const saved = fu; fu = to;
       convertDensityDisplay(densBefore, currentDensMode());
       fu = saved;
@@ -1312,6 +1347,9 @@
     const gal = fuelVolToGal(n('fuelVol'));
     const dens = densToLbPerGal(n('fuelDensity'));
     const fuelW = gal * dens;
+    const tksGal = fuelVolToGal(n('tksVol'));
+    const tksDens = densToLbPerGal(n('tksDensity'));
+    const tksW = tksGal * tksDens;
     return [
       { name: 'Basic Empty Weight', w: bew, arm: emptyArm },
       { name: 'Pilot (' + $('pilotSeat').value + ')', w: pilotW, arm: pilotArm },
@@ -1319,6 +1357,7 @@
       { name: 'Rear left', w: rearL, arm: REAR_ARM },
       { name: 'Rear right', w: rearR, arm: REAR_ARM },
       { name: 'Fuel (' + fmt(gal, 1) + ' gal)', w: fuelW, arm: FUEL_ARM },
+      { name: 'TKS fluid (CAV) (' + fmt(tksGal, 1) + ' gal)', w: tksW, arm: TKS_ARM },
       { name: 'Baggage', w: bag, arm: BAG_ARM },
       { name: 'Hat rack', w: hat, arm: HAT_ARM }
     ];
@@ -1356,6 +1395,8 @@
     const overLW = totalW > MAX_LW + 0.05;
     const overBag = bag > BAG_MAX + 0.05;
     const overHat = hat > HAT_MAX + 0.05;
+    const tksGal = fuelVolToGal(n('tksVol'));
+    const overTks = tksGal > TKS_MAX_GAL + 0.05;
     const inEnv = pointInEnvelope(cg, totalW);
     const cgBad = totalW >= 2430 && !inEnv;
 
@@ -1368,6 +1409,7 @@
     $('mMoment').classList.toggle('bad', overTO);
     $('mUseful').classList.toggle('bad', overTO);
     $('fuelWtDisp').textContent = fmtWt(stations.find(s => s.name.startsWith('Fuel')).w);
+    $('tksWtDisp').textContent = fmtWt(stations.find(s => s.name.startsWith('TKS')).w);
 
     const tbody = $('stationBody');
     tbody.innerHTML = '';
@@ -1402,8 +1444,10 @@
     else addPill('CG within envelope', '');
     if (overBag) addPill('Baggage over ' + fmtWt(BAG_MAX) + ' ' + wu, 'bad');
     if (overHat) addPill('Hat rack over ' + fmtWt(HAT_MAX) + ' ' + wu, 'bad');
+    if (overTks) addPill('TKS fluid over ' + fmt(TKS_MAX_GAL, 1) + ' gal (POH 21J full)', 'bad');
     $('baggage').classList.toggle('over', overBag);
     $('hatRack').classList.toggle('over', overHat);
+    $('tksVol').classList.toggle('over', overTks);
     drawPlot(cg, totalW, overTO || cgBad);
   }
 
@@ -1652,7 +1696,8 @@
 
   const inputIds = [
     'bew', 'emptyArm', 'pilotW', 'copilotW', 'pilotSeat', 'copilotSeat',
-    'rearL', 'rearR', 'fuelVol', 'fuelDensity', 'baggage', 'hatRack'
+    'rearL', 'rearR', 'fuelVol', 'fuelDensity', 'tksVol', 'tksDensity',
+    'baggage', 'hatRack'
   ];
   inputIds.forEach(id => {
     const el = $(id);
@@ -1704,6 +1749,8 @@
     $('rearR').value = '0';
     $('fuelVol').value = '89';
     $('fuelDensity').value = '5.82';
+    $('tksVol').value = '0';
+    $('tksDensity').value = '9.2';
     $('baggage').value = '0';
     $('hatRack').value = '0';
     $('reg').value = '';
