@@ -35,7 +35,13 @@
       --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
     }
     * { box-sizing: border-box; }
-    html { -webkit-text-size-adjust: 100%; }
+    /* iOS: avoid 100vh (URL-bar / Sites chrome double-count). Let content define height. */
+    html {
+      -webkit-text-size-adjust: 100%;
+      height: auto;
+      min-height: 0;
+      overflow-x: hidden;
+    }
     body {
       margin: 0;
       font-family: var(--font);
@@ -43,7 +49,21 @@
       line-height: 1.45;
       color: var(--ink);
       background: var(--bg);
-      padding: 0 0 3rem;
+      min-height: 0;
+      height: auto;
+      /* Modest bottom pad + home-indicator inset; no large empty bar */
+      padding: 0 0 max(0.75rem, env(safe-area-inset-bottom, 0px));
+      overflow-x: hidden;
+    }
+    /* Google Sites / iframe embed: never force a viewport-tall page inside the frame */
+    html.embedded, html.embedded body {
+      min-height: 0 !important;
+      height: auto !important;
+      max-height: none;
+      overflow-x: hidden;
+    }
+    html.embedded body {
+      padding-bottom: 0.75rem; /* safe-area belongs to the outer Sites chrome */
     }
     header.app-header {
       background: linear-gradient(135deg, #1a3a2a 0%, #2d6a4f 100%);
@@ -247,6 +267,10 @@
       cursor: pointer;
     }
     .results-panel { position: sticky; top: 0; z-index: 5; }
+    /* Sticky on iOS Safari can invent phantom bottom scroll space; keep static on phones */
+    @media (max-width: 719px) {
+      .results-panel { position: static; }
+    }
     .metrics {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -1696,6 +1720,65 @@
   calcLanding();
   calcCruise();
 })();
+  </script>
+
+  <script>
+  /* Detect Sites/iframe embed; ask Google Sites intermediate frame to grow to content height.
+     Protocol: postMessage({ magic: 'SHIC', type: 'resize', height }) — see gstatic atari intermediate-frame. */
+  (function () {
+    var embedded = false;
+    try { embedded = window.parent && window.parent !== window; } catch (e) { embedded = true; }
+    if (embedded) document.documentElement.classList.add('embedded');
+
+    function contentHeight() {
+      var b = document.body, h = document.documentElement;
+      return Math.ceil(Math.max(
+        b ? b.scrollHeight : 0,
+        b ? b.offsetHeight : 0,
+        h ? h.scrollHeight : 0,
+        h ? h.offsetHeight : 0
+      ));
+    }
+
+    var lastSent = 0;
+    function notifyParentHeight() {
+      if (!embedded) return;
+      var height = contentHeight();
+      if (!height || Math.abs(height - lastSent) < 2) return;
+      lastSent = height;
+      var msg = { magic: 'SHIC', type: 'resize', height: height };
+      try { window.parent.postMessage(msg, '*'); } catch (e) {}
+      // Also try grandparent in case an extra wrapper sits between us and Sites
+      try {
+        if (window.parent.parent && window.parent.parent !== window.parent) {
+          window.parent.parent.postMessage(msg, '*');
+        }
+      } catch (e) {}
+    }
+
+    var scheduled = null;
+    function scheduleNotify() {
+      if (scheduled) return;
+      scheduled = requestAnimationFrame(function () {
+        scheduled = null;
+        notifyParentHeight();
+      });
+    }
+
+    window.addEventListener('load', function () {
+      notifyParentHeight();
+      setTimeout(notifyParentHeight, 100);
+      setTimeout(notifyParentHeight, 500);
+      setTimeout(notifyParentHeight, 1500);
+    });
+    window.addEventListener('resize', scheduleNotify);
+    if (typeof ResizeObserver !== 'undefined') {
+      try { new ResizeObserver(scheduleNotify).observe(document.body); } catch (e) {}
+    }
+    document.addEventListener('input', scheduleNotify, true);
+    document.addEventListener('change', scheduleNotify, true);
+    document.addEventListener('click', scheduleNotify, true);
+  })();
   </script>
 
   <script>

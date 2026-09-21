@@ -90,3 +90,13 @@ Training / planning aid only. The AFM/POH governs. Takeoff/landing distances are
 ## Specs source
 
 `m20v_build_notes.md`, `m20v_values_to_update.md`, `poh_extract/cruise_power_tables.txt`, Excel `Cruise FF Tables` sheet, POH Sec II / IV / V / VI.
+
+## Google Sites embed (mooneypros.com)
+
+The calculator is embedded as a “whole page” URL embed. On iPhone, a short Sites
+aspect-ratio box left a large blank region under a ~200px-tall iframe.
+
+This app posts Google Sites’ `SHIC` resize messages so the embed can grow to the
+content height. If a blank band remains after publish/cache refresh, open the
+Sites editor → select the embed → set the aspect ratio to a tall/portrait size
+(or the tallest custom ratio), then republish.
