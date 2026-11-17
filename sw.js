@@ -1,5 +1,5 @@
 /* M20V W&B — service worker for offline home-screen use */
-const CACHE = 'm20v-wandb-v16';
+const CACHE = 'm20v-wandb-v17';
 const ASSETS = [
   './',
   './index.html',

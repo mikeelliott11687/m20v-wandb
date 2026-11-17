@@ -168,3 +168,22 @@ Behaviour specific to these three profiles (other models unchanged):
 - **Cruise:** `cruise.mode = "na_mp"` — POH Cruise & Range rows (RPM + whole-inch MP), linear in altitude SL–12,500 ft; shows FF, %BHP and TAS at gross. FF not interpolated across a full-rich/leaned row change. LOP HP factor stays **14.9**.
 - Speeds: POH liftoff text (65–75 MPH) and 80 MPH approach; no 50 ft or short-field speeds are published.
 - Model-specific labels via `P.ui` + `data-dyn` hooks; models without `ui` restore their original markup.
+
+## Earlier-model fixes (2026-11-17, cache v17)
+Applies to M20V, M20TN, M20U, M20R, M20J (2740 / 2900), M20K 231, M20K Encore and M20M. No chart or POH table data changed.
+1. **CG is always checked.** Envelopes now extend down to 1500 lb with the forward/aft limits held constant
+   (TCDS 2A3 / POH Sec VI "at X lb or less"); below the lowest charted weight the CG is checked against the floor limits.
+   Previously the CG was not checked below 2430 lb on any model (also above the real floor on the M20J and M20K 231).
+2. **Envelope edges are inclusive** on every model, so exactly max gross (or exactly on a limit line) reads as within limits.
+3. **Landing approach speeds** come from each POH: Sec IV 75 / 70 KIAS at 3200 lb for V/TN/U/R/M (the old
+   √(W/3200) scaling was app-invented and is gone); M20J 1229 Sec IV 71 KIAS on final; M20J 3203B, M20K 231 and Encore
+   use the Sec V chart approach speed by weight; no separate short-field speed is shown where the POH has none.
+4. **Model-specific text** (arms, fuel and TKS hints, conditions lists, cruise notes, mixture labels, footer limits) for every model.
+5. **Blank POH chart cells are never read as zero.** Distances that would touch a blank cell show "—" with a note;
+   the landing brake-speed column no longer shows "0"; cruise rows at an exact table altitude use the published value.
+   Cruise altitude limit now follows each table (M20K 231 / Encore to 24,000 ft, previously clamped at 20,000).
+6. **Max continuous RPM** pill per POH (2500 V/TN/U/R, 2575 M, 2700 J and K 231, 2600 Encore). The 30.5 in / 1675°F
+   TIT notes apply only to M20V/TN; the M20M gets its own POH note 3 (above 22,000 ft and MP > 32 in: best power or richer).
+7. **Reset defaults** load the selected model's POH Sec VI sample-problem BEW/arm and its usable fuel
+   (M20C/E/F have no sample problem, so Reset keeps your BEW and arm).
+8. **Mobile**: W&B cards no longer overflow at 390 / 320 px.
