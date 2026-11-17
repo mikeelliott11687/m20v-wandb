@@ -1,6 +1,6 @@
 # Mooney M20 W&B & Performance (web)
 
-Offline single-page calculator for Mooney **M20V Acclaim Ultra**, **M20TN**, **M20U Ovation Ultra**, **M20R Ovation**, **M20J 201** (2740 lb early / 2900 lb late), **M20K 231**, **M20K Encore**, and **M20M Bravo**.
+Offline single-page calculator for Mooney **M20V Acclaim Ultra**, **M20TN**, **M20U Ovation Ultra**, **M20R Ovation**, **M20J 201** (2740 lb early / 2900 lb late), **M20K 231**, **M20K Encore**, **M20M Bravo**, and the vintage short-body **M20C**, **M20E**, and **M20F**.
 Model toggle via `<select id="modelSelect">` — BEW / empty arm are never overwritten when switching.
 Companion / fallback to the Open as App workbook.
 
@@ -144,3 +144,27 @@ Each `MODEL_PROFILES` entry carries `ac: { available, weightLb: 66.1, armIn: 59.
 | M20K 231 | 5-19 done | 5-15 done | 5-48 done | 5-16/5-49 PENDING |
 | M20K Encore | 5-20 done | 5-15 done | 5-25 done | % notes only PENDING |
 | M20M Bravo | 5-20 done | 5-14 done | 5-25 done | 5-15/5-26 PENDING |
+
+
+## M20C / M20E / M20F notes (2026-11-17)
+
+Sources (Mooney-published; checked against TCDS 2A3 Rev 44):
+- **M20C:** Operator's Manual 74-20C-O (Dec 1974, S/N 20-1147 & on) for performance, limits and V-speeds; **W&B Record "Model M20C 1968 & on"** (rev 10/78) for loading arms.
+- **M20E:** Owner's Manual 1202 (1971, S/N 21-0001 & on; FAA AFM approved 8-21-70); **M20E W&B Record** (rev 4/74).
+- **M20F:** Owner's Manual (Feb 1970, S/N 700001 & on); **M20F W&B Record** (rev 1/74, 4/74).
+
+| Model | GW | CG envelope (in) | Front FWD / MID* / AFT | Rear | Bag / Hat | Fuel | Oil |
+|-------|----|------------------|-----------------------|------|-----------|------|-----|
+| M20C | 2575 | fwd 42.0 @ ≤2100 → 46.5 @ 2575; aft 49.0 | 37.75 / 40.88 / 44.0 | 70.7 | 120 @ 93.0 / 10 @ 114.0 | 52 gal @ 48.43 | 15 lb @ −7.4 |
+| M20E | 2575 | same as M20C | 37.75 / 40.88 / 44.0 | 70.7 | 120 @ 93.0 / 10 @ 114.0 | 52 gal @ 48.43 | 15 lb @ −6.5 |
+| M20F | 2740 | fwd 41.0 @ ≤2250, 41.8 @ 2470, 45.0 @ 2740; aft 50.1 | 32.75 / 35.88 / 39.0 | 70.7 | 120 @ 95.5 / 10 @ 119.0 | 64 gal @ 48.43 | 15 lb @ −11.5 |
+
+\*MID is interpolated between the record's FWD and AFT seat lines (not a POH number).
+
+Behaviour specific to these three profiles (other models unchanged):
+- **Oil toggle:** the W&B Records add 8 qt oil separately from empty weight, so an "Add engine oil" checkbox (default on) adds a 15 lb station.
+- **CG check at all weights** (`cgCheckMinW: 0`) and **inclusive envelope edges** (`inclusiveEnvelope`), so exactly-max-gross points read as in limits.
+- **Distances:** `dist.*.mode = "rows"` — the POH Sec VI tables as printed (PA rows, each with its own three temperatures; two weights). Interpolates OAT → PA → weight. Hotter or higher than printed → "—"; colder / lighter → edge value (conservative). M20C/E landing table is standard-temp only: warmer-than-standard days enter at density altitude (app assumption, flagged). No POH wind correction → no credit, tailwind flagged.
+- **Cruise:** `cruise.mode = "na_mp"` — POH Cruise & Range rows (RPM + whole-inch MP), linear in altitude SL–12,500 ft; shows FF, %BHP and TAS at gross. FF not interpolated across a full-rich/leaned row change. LOP HP factor stays **14.9**.
+- Speeds: POH liftoff text (65–75 MPH) and 80 MPH approach; no 50 ft or short-field speeds are published.
+- Model-specific labels via `P.ui` + `data-dyn` hooks; models without `ui` restore their original markup.
